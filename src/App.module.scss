@@ -1,0 +1,14 @@
+@use "@styles/tokens" as *;
+
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $background-color-standard-100;
+}
+
+.main {
+  flex: 1;
+  padding: $spacing-m;
+  overflow-x: auto;
+}

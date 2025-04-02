@@ -1,0 +1,22 @@
+@use "@styles/tokens" as *;
+
+.header {
+  background-color: $background-color-standard-100;
+  padding: 0 $spacing-m;
+  height: 64px;
+  line-height: 64px;
+  border-bottom: $border-standard-100;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  margin: 0 !important;
+  color: $font-color-main-standard;
+}

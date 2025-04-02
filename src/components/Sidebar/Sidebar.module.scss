@@ -1,0 +1,20 @@
+@use "@styles/tokens" as *;
+
+.sidebar {
+  border-right: $border-standard-100;
+}
+
+.logo {
+  height: 64px;
+  padding: $spacing-m;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: $border-standard-100;
+
+  span {
+    color: $interaction-color-action;
+    font-size: $font-size-h5;
+    font-weight: $font-weight-semi-bold;
+  }
+}

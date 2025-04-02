@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1743584192523" clover="3.2.0">
+  <project timestamp="1743584192523" name="All files">
+    <metrics statements="89" coveredstatements="86" conditionals="20" coveredconditionals="15" methods="28" coveredmethods="26" elements="137" coveredelements="127" complexity="0" loc="89" ncloc="89" packages="2" files="3" classes="3"/>
+    <package name="services">
+      <metrics statements="85" coveredstatements="82" conditionals="18" coveredconditionals="13" methods="27" coveredmethods="25"/>
+      <file name="mockApi.ts" path="/Users/christiantorrealba/christianjtr.github/simple-task-manager/src/services/mockApi.ts">
+        <metrics statements="35" coveredstatements="35" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="8"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="28" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="36" count="2" type="stmt"/>
+        <line num="38" count="2" type="stmt"/>
+        <line num="39" count="150" type="stmt"/>
+        <line num="40" count="150" type="stmt"/>
+        <line num="43" count="150" type="stmt"/>
+        <line num="44" count="150" type="cond" truecount="2" falsecount="0"/>
+        <line num="51" count="150" type="stmt"/>
+        <line num="61" count="150" type="stmt"/>
+        <line num="62" count="150" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="68" count="15" type="stmt"/>
+        <line num="70" count="2" type="stmt"/>
+        <line num="71" count="11" type="stmt"/>
+        <line num="72" count="11" type="stmt"/>
+        <line num="73" count="11" type="stmt"/>
+        <line num="76" count="4" type="stmt"/>
+        <line num="77" count="4" type="stmt"/>
+        <line num="79" count="4" type="stmt"/>
+        <line num="80" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="81" count="1" type="stmt"/>
+        <line num="84" count="3" type="stmt"/>
+        <line num="90" count="3" type="stmt"/>
+        <line num="91" count="3" type="stmt"/>
+        <line num="96" count="11" type="stmt"/>
+        <line num="97" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="98" count="3" type="stmt"/>
+        <line num="101" count="8" type="stmt"/>
+        <line num="107" count="8" type="stmt"/>
+        <line num="108" count="8" type="stmt"/>
+        <line num="113" count="2" type="stmt"/>
+      </file>
+      <file name="mockWebSocket.ts" path="/Users/christiantorrealba/christianjtr.github/simple-task-manager/src/services/mockWebSocket.ts">
+        <metrics statements="50" coveredstatements="47" conditionals="14" coveredconditionals="9" methods="19" coveredmethods="17"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="23" count="10" type="stmt"/>
+        <line num="24" count="10" type="stmt"/>
+        <line num="25" count="10" type="stmt"/>
+        <line num="26" count="10" type="stmt"/>
+        <line num="27" count="10" type="stmt"/>
+        <line num="33" count="13" type="stmt"/>
+        <line num="34" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="41" count="8" type="stmt"/>
+        <line num="42" count="8" type="stmt"/>
+        <line num="43" count="5" type="stmt"/>
+        <line num="48" count="9" type="cond" truecount="0" falsecount="1"/>
+        <line num="51" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="55" count="9" type="stmt"/>
+        <line num="56" count="9" type="stmt"/>
+        <line num="61" count="2" type="stmt"/>
+        <line num="68" count="9" type="stmt"/>
+        <line num="69" count="43" type="stmt"/>
+        <line num="74" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="75" count="2" type="stmt"/>
+        <line num="76" count="2" type="stmt"/>
+        <line num="79" count="7" type="stmt"/>
+        <line num="80" count="7" type="stmt"/>
+        <line num="86" count="10" type="stmt"/>
+        <line num="87" count="10" type="stmt"/>
+        <line num="89" count="10" type="stmt"/>
+        <line num="90" count="2" type="stmt"/>
+        <line num="93" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="94" count="1" type="stmt"/>
+        <line num="95" count="0" type="stmt"/>
+        <line num="101" count="10" type="cond" truecount="1" falsecount="2"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="107" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="109" count="2" type="stmt"/>
+        <line num="110" count="2" type="stmt"/>
+        <line num="113" count="2" type="stmt"/>
+        <line num="114" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="117" count="2" type="stmt"/>
+        <line num="123" count="2" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="133" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="types">
+      <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="task.ts" path="/Users/christiantorrealba/christianjtr.github/simple-task-manager/src/types/task.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

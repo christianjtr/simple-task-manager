@@ -1,0 +1,70 @@
+// DESIGN SYSTEM TOKENS
+
+/******
+		COLORS
+				******/
+$black: #1a1c1e;
+$white: #ffffff;
+
+// FONT COLORS
+$font-color-main-standard: #2c3e50;
+$font-color-support-standard: #64748b;
+
+// BACKGROUND COLORS
+$background-color-standard-100: $white;
+$background-color-standard-200: #f8fafc;
+
+// INTERACTION COLORS
+$interaction-color-action: #0284c7;
+$interaction-color-link: #0284c7;
+$interaction-color-highlight: #fef9c3;
+$interaction-color-success: #059669;
+$interaction-color-error: #dc2626;
+$interaction-color-warning: #d97706;
+
+/******
+        BASIC RULES
+                    ******/
+
+// SPACING
+$spacing-xxxxs: 2px;
+$spacing-xxxs: 4px;
+$spacing-xxs: 8px;
+$spacing-xs: 12px;
+$spacing-s: 16px;
+$spacing-m: 20px;
+$spacing-l: 24px;
+$spacing-xl: 28px;
+$spacing-xxl: 32px;
+$spacing-xxxl: 36px;
+$spacing-xxxxl: 48px;
+
+// BORDER
+$border-style-default: solid;
+$border-size-100: 1px;
+$border-size-120: 2px;
+$border-standard-100: $border-style-default $border-size-100 rgba(0, 0, 0, 0.06);
+
+// RADIUS
+$round-0: 0;
+$round-100: 4px;
+$round-120: 8px;
+$round-140: 12px;
+$round-160: 16px;
+
+/******
+        TYPOGRAPHY
+                ******/
+
+$font-size-support: 12px;
+$font-size-standard: 14px;
+$font-size-h5: 16px;
+$font-size-h4: 20px;
+$font-size-h3: 24px;
+$font-size-h2: 30px;
+$font-size-h1: 38px;
+$font-size-h0: 46px;
+$font-weight-normal: 400;
+$font-weight-semi-bold: 600;
+$font-weight-bold: 700;
+$font-weight-heavy: 800;
