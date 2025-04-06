@@ -3,13 +3,18 @@ import { Layout } from "antd";
 import { Header } from "./components/Header/Header";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { mockWebSocket, WebSocketEventType } from "./services/mockWebSocket";
-import { Task } from "./types/task";
+import type { Task } from "./types/task";
+import { TaskBoard } from "./components/TaskBoard/TaskBoard";
+import { useTaskService } from "./hooks/useTaskService";
+
 import styles from "./App.module.scss";
 
 const { Content } = Layout;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
+
+  const { tasks } = useTaskService();
 
   useEffect(() => {
     mockWebSocket.connect();
@@ -33,7 +38,7 @@ const App = () => {
       <Layout>
         <Header />
         <Content className={styles.main}>
-          {/* implement Kanban board here */}
+          <TaskBoard tasks={tasks} />
         </Content>
       </Layout>
     </Layout>
