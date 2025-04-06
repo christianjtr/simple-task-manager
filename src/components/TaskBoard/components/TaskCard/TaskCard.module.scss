@@ -1,0 +1,20 @@
+@use "@styles/tokens" as *;
+
+.taskCard {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: $background-color-hover-standard;
+    }
+
+    &:active {
+        background-color: lighten($interaction-color-action, 50%);
+    }
+}

@@ -1,0 +1,10 @@
+@use "@styles/tokens" as *;
+
+.taskBoardStage {
+    background-color: $background-color-standard-200;
+    padding: $spacing-xs;
+
+    .title {
+        margin: 0;
+    }
+}
