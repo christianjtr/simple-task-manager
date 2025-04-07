@@ -1,5 +1,6 @@
-import React from "react";
-import { Typography, Divider, List } from "antd";
+import React, { useState, useEffect } from "react";
+import { Typography, Divider } from "antd";
+import { ReactSortable } from "react-sortablejs";
 
 import { TaskStatus, Task } from "@src/types/task";
 import { TaskCard } from "../TaskCard/TaskCard";
@@ -14,22 +15,29 @@ export interface TaskBoardStageProps {
 
 const { Title } = Typography;
 
-const TaskBoardStage: React.FC<TaskBoardStageProps> = (props): React.JSX.Element => {
+const TaskBoardStage: React.FC<TaskBoardStageProps> = (props): React.JSX.Element | null => {
     const { title, status: taskBoardStatus, tasks, id } = props;
+
+    const [stageTasks, setStageTasks] = useState<Task[]>([]);
+
+    useEffect(() => {
+        setStageTasks(tasks);
+    }, [tasks]);
 
     return (
         <div className={styles.taskBoardStage} data-testid={`task_board_stage_item_${id}`}>
             <Title level={4} className={styles.title}>{title}</Title>
             <Divider />
-            <List
-                grid={{ gutter: 16, column: 1 }}
-                dataSource={tasks}
-                renderItem={(item, index) => (
-                    <List.Item key={`task_card_status_${taskBoardStatus.toLowerCase()}_item_${index}`}>
-                        <TaskCard {...item} />
-                    </List.Item>
-                )}
-            />
+            <ReactSortable
+                list={stageTasks}
+                setList={setStageTasks} className={styles.list}
+                group="taskboard"
+                animation={150}
+            >
+                {stageTasks.map((item, index) => (
+                    <TaskCard key={`task_card_status_${taskBoardStatus.toLowerCase()}_item_${index}`} {...item} />
+                ))}
+            </ReactSortable>
         </div>
     );
 }

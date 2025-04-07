@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "@styles/tokens" as *;
 
 .taskCard {
@@ -15,6 +16,9 @@
     }
 
     &:active {
-        background-color: lighten($interaction-color-action, 50%);
+        background-color: color.adjust(
+            $interaction-color-action,
+            $lightness: 50%
+        );
     }
 }
