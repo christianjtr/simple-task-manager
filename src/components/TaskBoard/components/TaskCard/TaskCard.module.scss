@@ -22,3 +22,11 @@
         );
     }
 }
+
+.taskCard .image {
+    width: 100%;
+
+    * {
+        width: inherit !important;
+    }
+}

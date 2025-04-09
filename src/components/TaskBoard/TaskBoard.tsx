@@ -1,30 +1,31 @@
 import React, { useMemo } from "react";
 import { Col, Row } from "antd";
+import toastr from 'toastr';
 
 import { TaskStatus, type Task } from "@src/types/task";
 import type { TaskBoardStageProps } from "./components/TaskBoardStage/TaskBoardStage";
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
+import { useAppSelector } from "../../hooks/useReduxStore";
 
 interface TaskBoardProps {
-    tasks: Task[];
-    stages?: TaskBoardStageProps[];
+    onTransitionTask: (taskId: Task['id'], task: Partial<Task>) => Promise<void>;
 }
 
 const DEFAULT_STAGES: TaskBoardStageProps[] = [
     {
-        id: "todo",
+        id: TaskStatus.TODO,
         title: "To Do",
         status: TaskStatus.TODO,
         tasks: [],
     },
     {
-        id: "in_progress",
+        id: TaskStatus.IN_PROGRESS,
         title: "In Progress",
         status: TaskStatus.IN_PROGRESS,
         tasks: [],
     },
     {
-        id: "done",
+        id: TaskStatus.DONE,
         title: "Done",
         status: TaskStatus.DONE,
         tasks: [],
@@ -32,18 +33,38 @@ const DEFAULT_STAGES: TaskBoardStageProps[] = [
 ];
 
 const TaskBoard: React.FC<TaskBoardProps> = (props): React.JSX.Element | null => {
-    const { stages = DEFAULT_STAGES, tasks } = props;
+    const { onTransitionTask: transitionTask } = props;
+
+    const tasks: Task[] = useAppSelector((state) => state.tasks.tasks);
 
     const stagesWithTasks = useMemo(() => {
-        const data = stages.map((eachStage) => ({
+        const data = DEFAULT_STAGES.map((eachStage) => ({
             ...eachStage,
-            tasks: tasks.filter((eachTask) => eachTask.status === eachStage.status)
+            tasks: tasks
+                .map((eachTask) => ({
+                    ...eachTask,
+                    selected: false,
+                    chosen: false,
+                    filtered: false,
+                }))
+                .filter((eachTask) => eachTask.status === eachStage.status)
         }));
 
         return data;
     }, [tasks]);
 
-    if (!tasks) {
+    const handleOnTransitionTask = async (taskId: Task['id'], status: TaskStatus): Promise<void> => {
+        try {
+            await transitionTask(taskId, { status });
+            toastr.success(`Task: ${taskId}, moved to ${status}`, 'Success');
+        } catch (error) {
+            const errorOnTransitioningTask = useAppSelector((state) => state.tasks.error);
+            toastr.error(`Cannot transition task: ${taskId}, Issue: ${errorOnTransitioningTask}`, 'Ups!');
+            throw (error);
+        }
+    }
+
+    if (stagesWithTasks.length === 0) {
         return null;
     }
 
@@ -51,8 +72,8 @@ const TaskBoard: React.FC<TaskBoardProps> = (props): React.JSX.Element | null =>
         <React.Fragment>
             <Row gutter={[24, 24]}>
                 {stagesWithTasks.map((eachStage, index) => (
-                    <Col key={`task_board_stage_item_${index}`} span={24 / stages.length}>
-                        <TaskBoardStage {...eachStage} />
+                    <Col key={`task_board_stage_item_${index}`} span={24 / DEFAULT_STAGES.length}>
+                        <TaskBoardStage {...eachStage} onTransitionTask={handleOnTransitionTask} />
                     </Col>
                 ))}
             </Row>

@@ -11,19 +11,22 @@ const { Text } = Typography;
 const TaskCard: React.FC<Task> = (props): React.JSX.Element => {
     const { title, description, updatedAt, id, image } = props;
 
-    // const MemoizedImageComponent = memo(() => {
-    //     if (!image) {
-    //         return null;
-    //     }
-    //     return (<OptimizedImage src={image.url} alt={image.alt || ""} />);
-    // });
+    const MemoizedImageComponent = memo(() => {
+        if (!image) {
+            return null;
+        }
+        return (<OptimizedImage src={image.url} alt={image.alt || ""} />);
+    });
 
     const updateAtToDisplay = useMemo(() => formatDateForDisplay(updatedAt), [updatedAt]);
 
     return (
-        <div data-testid={`task_card_item_${id}`}>
-            {/* <Card cover={<MemoizedImageComponent />}> */}
+        <div id={id} data-testid={`task_card_item_${id}`}>
             <Card
+                classNames={{
+                    cover: styles.image,
+                }}
+                // cover={<MemoizedImageComponent />}
                 id={id}
                 title={title}
                 extra={<Text type="secondary">{updateAtToDisplay}</Text>}
