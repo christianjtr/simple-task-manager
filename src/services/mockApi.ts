@@ -1,4 +1,5 @@
 import { Task, TaskStatus, TaskImage } from "../types/task";
+import { mockWebSocket, WebSocketEventType } from "./mockWebSocket";
 
 const sampleImages: TaskImage[] = [
   {
@@ -88,6 +89,12 @@ export const mockApi = {
     };
 
     taskStore.set(taskId, updatedTask);
+
+    mockWebSocket.send({
+      type: WebSocketEventType.TASK_UPDATE,
+      payload: updatedTask,
+    });
+
     return updatedTask;
   },
 
@@ -101,6 +108,12 @@ export const mockApi = {
     };
 
     taskStore.set(task.id, task);
+
+    mockWebSocket.send({
+      type: WebSocketEventType.TASK_CREATE,
+      payload: task,
+    });
+
     return task;
   },
 
@@ -111,7 +124,15 @@ export const mockApi = {
       throw new Error(`Task ${taskId} not found`);
     }
 
+    const deletedTask = taskStore.get(taskId);
     taskStore.delete(taskId);
+
+    taskStore.delete(taskId);
+
+    mockWebSocket.send({
+      type: WebSocketEventType.TASK_DELETE,
+      payload: deletedTask!,
+    });
   },
 
   // Internal method to update task state without delay
