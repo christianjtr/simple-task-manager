@@ -19,6 +19,10 @@ class MockWebSocket {
   private isConnected: boolean = false;
   private simulationInterval: NodeJS.Timeout | null = null;
 
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectDelay = 1000;
+
   connect(): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -127,6 +131,27 @@ class MockWebSocket {
     } catch (error) {
       console.error("Failed to simulate random update:", error);
     }
+  }
+
+  private reconnect(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error("Max reconnection attempts reached.");
+      return;
+    }
+
+    console.log(`Attempting reconnection in ${this.reconnectDelay}ms...`);
+    setTimeout(() => {
+      this.connect().then(() => {
+        console.log("Reconnected.");
+        this.reconnectAttempts = 0;
+        this.reconnectDelay = 1000;
+        this.startSimulation();
+      }).catch(() => {
+        this.reconnectAttempts++;
+        this.reconnectDelay *= 2;
+        this.reconnect();
+      });
+    }, this.reconnectDelay);
   }
 }
 

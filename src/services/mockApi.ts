@@ -68,70 +68,94 @@ const generateMockTasks = (count: number): Task[] => {
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function performRequestWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, retryDelay = 1000): Promise<T> {
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      return await fn();
+    } catch (error) {
+      console.error(`Request failed, retrying in ${retryDelay}ms...`, error);
+      retries++;
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      retryDelay *= 2;
+    }
+  }
+  throw new Error("Max retries exceeded");
+}
+
 export const mockApi = {
   getTasks: async (): Promise<Task[]> => {
-    await delay(800);
-    return Array.from(taskStore.values());
+    return performRequestWithRetry(async () => {
+      await delay(800);
+      return Array.from(taskStore.values());
+    });
   },
 
   updateTask: async (taskId: string, updates: Partial<Task>): Promise<Task> => {
-    await delay(300);
+    return performRequestWithRetry(async () => {
+      await delay(300);
 
-    const existingTask = taskStore.get(taskId);
-    if (!existingTask) {
-      throw new Error(`Task ${taskId} not found`);
-    }
+      const existingTask = taskStore.get(taskId);
+      if (!existingTask) {
+        throw new Error(`Task ${taskId} not found`);
+      }
 
-    const updatedTask = {
-      ...existingTask,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
+      const updatedTask = {
+        ...existingTask,
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      };
 
-    taskStore.set(taskId, updatedTask);
+      taskStore.set(taskId, updatedTask);
 
-    mockWebSocket.send({
-      type: WebSocketEventType.TASK_UPDATE,
-      payload: updatedTask,
+      mockWebSocket.send({
+        type: WebSocketEventType.TASK_UPDATE,
+        payload: updatedTask,
+      });
+
+      return updatedTask;
     });
-
-    return updatedTask;
   },
 
   createTask: async (newTask: Task): Promise<Task> => {
-    await delay(300);
+    return performRequestWithRetry(async () => {
+      await delay(300);
 
-    const task = {
-      ...newTask,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      const task = {
+        ...newTask,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    taskStore.set(task.id, task);
+      taskStore.set(task.id, task);
 
-    mockWebSocket.send({
-      type: WebSocketEventType.TASK_CREATE,
-      payload: task,
+      mockWebSocket.send({
+        type: WebSocketEventType.TASK_CREATE,
+        payload: task,
+      });
+
+      return task;
     });
-
-    return task;
   },
 
   deleteTask: async (taskId: string): Promise<void> => {
-    await delay(300);
+    return performRequestWithRetry(async () => {
+      await delay(300);
 
-    if (!taskStore.has(taskId)) {
-      throw new Error(`Task ${taskId} not found`);
-    }
+      if (!taskStore.has(taskId)) {
+        throw new Error(`Task ${taskId} not found`);
+      }
 
-    const deletedTask = taskStore.get(taskId);
-    taskStore.delete(taskId);
+      const deletedTask = taskStore.get(taskId);
+      taskStore.delete(taskId);
 
-    taskStore.delete(taskId);
+      taskStore.delete(taskId);
 
-    mockWebSocket.send({
-      type: WebSocketEventType.TASK_DELETE,
-      payload: deletedTask!,
+      mockWebSocket.send({
+        type: WebSocketEventType.TASK_DELETE,
+        payload: deletedTask!,
+      });
     });
   },
 
