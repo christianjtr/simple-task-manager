@@ -1,23 +1,24 @@
 @use "@styles/tokens" as *;
+@import "toastr/build/toastr.min.css";
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-feature-settings: "tnum", "tnum";
-  font-size: $font-size-standard;
-  margin: 0;
-  line-height: 1.5715;
-  color: $font-color-main-standard;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-feature-settings: "tnum", "tnum";
+    font-size: $font-size-standard;
+    margin: 0;
+    line-height: 1.5715;
+    color: $font-color-main-standard;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
-  height: 100%;
+    height: 100%;
 }
