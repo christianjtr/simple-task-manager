@@ -43,9 +43,9 @@ const generateMockTasks = (count: number): Task[] => {
     const hasImage = Math.random() < 0.3;
     const image = hasImage
       ? {
-          ...sampleImages[Math.floor(Math.random() * sampleImages.length)],
-          id: `img-${i + 1}`,
-        }
+        ...sampleImages[Math.floor(Math.random() * sampleImages.length)],
+        id: `img-${i + 1}`,
+      }
       : undefined;
 
     const task = {
@@ -89,6 +89,29 @@ export const mockApi = {
 
     taskStore.set(taskId, updatedTask);
     return updatedTask;
+  },
+
+  createTask: async (newTask: Task): Promise<Task> => {
+    await delay(300);
+
+    const task = {
+      ...newTask,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    taskStore.set(task.id, task);
+    return task;
+  },
+
+  deleteTask: async (taskId: string): Promise<void> => {
+    await delay(300);
+
+    if (!taskStore.has(taskId)) {
+      throw new Error(`Task ${taskId} not found`);
+    }
+
+    taskStore.delete(taskId);
   },
 
   // Internal method to update task state without delay
