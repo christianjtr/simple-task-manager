@@ -28,6 +28,12 @@ export const taskSlice = createSlice({
         state.tasks[index] = action.payload;
       }
     },
+    addTask: (state, action: PayloadAction<Task>) => {
+      state.tasks.push(action.payload);
+    },
+    removeTask: (state, action: PayloadAction<Task['id']>) => {
+      state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -37,6 +43,6 @@ export const taskSlice = createSlice({
   },
 });
 
-export const { setTasks, updateTask, setLoading, setError } = taskSlice.actions;
+export const { setTasks, updateTask, addTask, removeTask, setLoading, setError } = taskSlice.actions;
 
 export default taskSlice.reducer;
