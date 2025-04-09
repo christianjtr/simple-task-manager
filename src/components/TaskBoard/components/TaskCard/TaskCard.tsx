@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Card, Typography } from "antd";
 
 import { OptimizedImage } from "@components/OptimizedImage/OptimizedImage";
@@ -11,13 +11,6 @@ const { Text } = Typography;
 const TaskCard: React.FC<Task> = (props): React.JSX.Element => {
     const { title, description, updatedAt, id, image } = props;
 
-    const MemoizedImageComponent = memo(() => {
-        if (!image) {
-            return null;
-        }
-        return (<OptimizedImage src={image.url} alt={image.alt || ""} />);
-    });
-
     const updateAtToDisplay = useMemo(() => formatDateForDisplay(updatedAt), [updatedAt]);
 
     return (
@@ -26,7 +19,7 @@ const TaskCard: React.FC<Task> = (props): React.JSX.Element => {
                 classNames={{
                     cover: styles.image,
                 }}
-                // cover={<MemoizedImageComponent />}
+                cover={image ? <OptimizedImage src={image.url} alt={image.alt || ""} /> : undefined}
                 id={id}
                 title={title}
                 extra={<Text type="secondary">{updateAtToDisplay}</Text>}
