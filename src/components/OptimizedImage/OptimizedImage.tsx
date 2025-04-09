@@ -22,6 +22,15 @@ const imageCache: ImageCache = {};
 const processImage = (src: string, quality: number = 0.7): Promise<string> => {
   return new Promise((resolve) => {
     const img = document.createElement("img");
+
+    /**
+     * INFO:
+     * Added due to "Uncaught DOMException: The operation is insecure" when calling canvas.toDataURL("image/jpeg", quality) 
+     * Occurs when trying to access data from a cross-origin image or canvas 
+     * without proper CORS (Cross-Origin Resource Sharing) headers.
+     */
+    img.crossOrigin = "anonymous";
+
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -82,7 +91,9 @@ export const OptimizedImage = memo(
         }
       };
 
-      loadImage();
+      if (src) {
+        loadImage();
+      }
 
       return () => {
         isMounted = false;
