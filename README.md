@@ -77,7 +77,7 @@ Before executing these scripts, you must run **npm install** in the directory yo
 
 ###### Strategy followed
 
-1. Basic implement of Kanban Board UI (Component Composition)
+1. Basic implementation of Kanban Board UI (Component Composition)
 2. Integrate WebSocket Data Synchronization (Custom Hook)
 3. Redux integration (WebSocket/MockAPI orchestration)
 4. Implement task management features
