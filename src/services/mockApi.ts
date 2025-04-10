@@ -70,6 +70,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function performRequestWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, retryDelay = 1000): Promise<T> {
   let retries = 0;
+  let lastError: unknown;
 
   while (retries < maxRetries) {
     try {
@@ -77,11 +78,13 @@ async function performRequestWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, 
     } catch (error) {
       console.error(`Request failed, retrying in ${retryDelay}ms...`, error);
       retries++;
+      lastError = error;
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       retryDelay *= 2;
     }
   }
-  throw new Error("Max retries exceeded");
+
+  throw lastError || new Error("Max retries exceeded");
 }
 
 export const mockApi = {

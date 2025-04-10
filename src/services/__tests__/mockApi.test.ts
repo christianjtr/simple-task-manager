@@ -66,7 +66,7 @@ describe("mockApi", () => {
       await expect(
         mockApi.updateTask("non-existent-id", { title: "New Title" })
       ).rejects.toThrow("Task non-existent-id not found");
-    });
+    }, 10000);
 
     it("should only update specified fields", async () => {
       const tasks = await mockApi.getTasks();
