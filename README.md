@@ -11,6 +11,7 @@ This assessment requires the development of a real-time task manager, featuring 
 3. [Installation and running the project](#003)
 4. [Samples](#004)
 5. [Dev notes](#005)
+6. [Next steps](#006)
 
 <a name="001"></a>
 
@@ -97,3 +98,19 @@ graph TD
     D -->|Tasks| I[TaskCard 5];
     style A fill:#f9f,stroke:#333,stroke-width:2px;
 ```
+
+<a name="006"></a>
+
+### Next steps
+
+1. Fine-tune the application and enhance overall styles.
+    - Align components with third-party design framework (Ant Design).
+2. Polish interactions, e.g., transition tasks across statuses.
+    - Work on transitions, animations, affordance, and similar.
+3. Improve the syncing process between the service layer and state manager.
+    - Better management of WebSocket/Redux layers.
+    - Offline support.
+4. Optimize performance and elevate error handling.
+    - Manage assets, caching strategies, etc.
+    - Make sure that potential flaws are covered.
+5. Add unit tests to the implementation.
