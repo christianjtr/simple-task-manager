@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Col, Row } from "antd";
-import toastr from 'toastr';
+import toastr from "toastr";
 
 import { TaskStatus, type Task } from "@src/types/task";
 import type { TaskBoardStageProps } from "./components/TaskBoardStage/TaskBoardStage";
@@ -58,8 +58,7 @@ const TaskBoard: React.FC<TaskBoardProps> = (props): React.JSX.Element | null =>
             await transitionTask(taskId, { status });
             toastr.success(`Task: ${taskId}, moved to ${status}`, 'Success');
         } catch (error) {
-            const errorOnTransitioningTask = useAppSelector((state) => state.tasks.error);
-            toastr.error(`Cannot transition task: ${taskId}, Issue: ${errorOnTransitioningTask}`, 'Ups!');
+            toastr.error(`Cannot transition task: ${taskId}, Issue: ${error}`, 'Ups!');
             throw (error);
         }
     }

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Task } from "../types/task";
 
-interface TaskState {
+export interface TaskState {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
