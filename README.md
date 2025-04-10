@@ -68,7 +68,7 @@ Before executing these scripts, you must run **npm install** in the directory yo
 1. Basic kanban board
 
 <p align="center">
-  <img src="https://github.com/christianjtr/basic-react-json-graphql-tryout/blob/main/samples/kanban.gif"/>
+  <img src="https://github.com/christianjtr/simple-task-manager/blob/main/samples/kanban.gif"/>
 </p>
 
 <a name="005"></a>
