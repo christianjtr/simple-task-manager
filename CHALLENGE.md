@@ -121,3 +121,47 @@ Good luck! Show us your skills, and feel free to reach out with any questions du
 ---
 
 **Happy Coding!** 🚀
+
+---
+
+## Modernization notes
+
+The repository was later modernized from the original mock real-time challenge into a local-first task manager. The original brief above is kept for context.
+
+### Modernized goals
+
+- Replace the mock API, mock WebSocket, and Redux store with Dexie-backed local persistence.
+- Add project management, task CRUD, search, and filters.
+- Use dnd-kit for accessible pointer and keyboard drag-and-drop.
+- Add versioned JSON backup export and import.
+- Keep a responsive dark/light shell with persistent preferences.
+- Improve tooling with pnpm, Biome, Vitest, Playwright, and Tailwind CSS v4.
+- Add documentation and a GitHub Pages workflow for the `demo` branch.
+
+### Requirement mapping
+
+| Original requirement | Modernized outcome |
+| --- | --- |
+| Three-column board | `TaskBoard` keeps To Do, In Progress, and Done mounted as droppable stages. |
+| 50-100 mock tasks | Optional example data is seeded into IndexedDB; the app starts with an empty state. |
+| Mock realtime WebSocket | Removed. `useLiveQuery` reacts to local Dexie writes. |
+| Redux state | Removed. Hooks and the task repository own reads and mutations. |
+| Native drag-and-drop | Replaced by dnd-kit with `DragOverlay` and keyboard announcements. |
+| `OptimizedImage` | Removed; cards focus on title, description, priority, due date, and tags. |
+| API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI. |
+| Unit and integration tests | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test. |
+| Type-checked production build | `pnpm build` runs `tsc -b` before Vite. |
+
+### Review stages
+
+Each stage was implemented in a dedicated branch and merged into `main`:
+
+1. `modernization/01-toolchain` — toolchain and test infrastructure.
+2. `modernization/02-domain-db` — domain, schema, Dexie, repository, seed, and backup helpers.
+3. `modernization/03-remove-realtime-redux` — removed legacy services and Redux.
+4. `modernization/04-shell-projects-theme` — shell, projects, theme, and empty states.
+5. `modernization/05-task-crud-filters` — task CRUD and filtering.
+6. `modernization/06-dnd-order` — drag-and-drop and persisted ordering.
+7. `modernization/07-portability` — JSON export/import UI.
+8. `modernization/08-docs-demo-workflow` — documentation and demo deployment.
+
