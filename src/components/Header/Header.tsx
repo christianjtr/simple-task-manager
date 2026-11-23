@@ -28,7 +28,7 @@ export const Header = ({
   onToggleSidebar,
   onToggleTheme,
 }: HeaderProps) => (
-  <AntHeader className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 md:px-6">
+  <AntHeader className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 md:px-6">
     <div className="flex min-w-0 items-center gap-3">
       <Tooltip title={collapsed ? t("header.showProjects") : t("header.hideProjects")}>
         <Button

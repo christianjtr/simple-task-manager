@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family:
     system-ui,
@@ -27,5 +32,11 @@ body {
 }
 
 #root {
+  height: 100%;
+  min-height: 100dvh;
+}
+
+.board-spin,
+.board-spin .ant-spin-container {
   height: 100%;
 }

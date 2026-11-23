@@ -26,7 +26,7 @@ export const TaskFiltersBar = ({
   onTag,
   onClear,
 }: TaskFiltersBarProps) => (
-  <Space wrap className="mb-4 w-full" size="small">
+  <Space wrap className="mb-4 w-full shrink-0" size="small">
     <Input.Search
       allowClear
       prefix={<SearchOutlined />}

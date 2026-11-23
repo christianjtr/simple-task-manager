@@ -45,6 +45,8 @@ export const en = {
   },
   stage: {
     dropTasks: "Drop tasks here",
+    countAriaOne: "1 task",
+    countAriaOther: "{count} tasks",
   },
   announcements: {
     taskFallback: "task",

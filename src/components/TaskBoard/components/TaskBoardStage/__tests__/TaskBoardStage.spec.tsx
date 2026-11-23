@@ -42,6 +42,12 @@ describe("TaskBoardStage", () => {
   it("renders an empty column with a drop hint", () => {
     renderStage([]);
     expect(screen.getByText("Drop tasks here")).toBeInTheDocument();
+    expect(screen.getByLabelText("0 tasks")).toHaveTextContent("0");
+  });
+
+  it("shows the task count next to the column title", () => {
+    renderStage([task("1", TaskStatus.TODO), task("2", TaskStatus.TODO)]);
+    expect(screen.getByLabelText("2 tasks")).toHaveTextContent("2");
   });
 
   it("exposes a keyboard-accessible drag handle for each task", () => {

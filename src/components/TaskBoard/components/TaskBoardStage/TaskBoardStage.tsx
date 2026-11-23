@@ -58,10 +58,22 @@ const TaskBoardStage = ({
       data-testid={`task_board_stage_item_${id}`}
       aria-label={`${title} column`}
     >
-      <Title level={4} className={styles.title}>
-        {title}
-      </Title>
-      <span className={styles.count}>{tasks.length}</span>
+      <div className={styles.header}>
+        <Title level={4} className={styles.title}>
+          {title}
+        </Title>
+        <span
+          className={`${styles.count} bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200`}
+          role="img"
+          aria-label={
+            tasks.length === 1
+              ? t("stage.countAriaOne")
+              : t("stage.countAriaOther", { count: tasks.length })
+          }
+        >
+          {tasks.length}
+        </span>
+      </div>
       <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
         <ul
           ref={setNodeRef}

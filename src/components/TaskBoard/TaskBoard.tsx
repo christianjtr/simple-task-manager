@@ -23,7 +23,7 @@ import type { Task, TaskFilters, TaskPriority, TaskStatus } from "@src/features/
 import { filterTasks } from "@src/features/tasks/task.utils";
 import { useTasks } from "@src/hooks/useTasks";
 import { t } from "@src/i18n/en";
-import { Alert, App as AntApp, Button, Col, Row, Spin, Typography } from "antd";
+import { Alert, App as AntApp, Button, Spin, Typography } from "antd";
 import { useMemo, useState } from "react";
 
 import { TaskFiltersBar } from "../TaskFiltersBar/TaskFiltersBar";
@@ -198,8 +198,8 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
   };
 
   return (
-    <Spin spinning={isLoading && tasks.length === 0}>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
         <div>
           <Title level={4} className="m-0">
             {t("board.tasks")}
@@ -236,38 +236,43 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
               {t("board.clearFilters")}
             </Button>
           }
-          className="mb-4"
+          className="mb-4 shrink-0"
         />
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        accessibility={{ announcements }}
-        onDragStart={handleDragStart}
-        onDragCancel={handleDragCancel}
-        onDragEnd={handleDragEnd}
-      >
-        <Row gutter={[16, 16]}>
-          {stages.map((stage) => (
-            <Col key={stage.id} xs={24} md={8}>
-              <TaskBoardStage
-                {...stage}
-                onMoveTask={handleMove}
-                onEditTask={openEditModal}
-                onDeleteTask={(id) => void handleDelete(id)}
-              />
-            </Col>
-          ))}
-        </Row>
-        <DragOverlay>
-          {activeTask ? (
-            <div className="rounded-lg border border-indigo-400 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-lg dark:border-indigo-500 dark:bg-slate-800 dark:text-slate-50">
-              {activeTask.title}
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+      <Spin spinning={isLoading && tasks.length === 0} wrapperClassName="board-spin min-h-0 flex-1">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          accessibility={{ announcements }}
+          onDragStart={handleDragStart}
+          onDragCancel={handleDragCancel}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex h-full min-h-0 gap-4 overflow-x-auto pb-2">
+            {stages.map((stage) => (
+              <div
+                key={stage.id}
+                className="flex h-full w-[min(85vw,22rem)] shrink-0 flex-col md:w-auto md:flex-1"
+              >
+                <TaskBoardStage
+                  {...stage}
+                  onMoveTask={handleMove}
+                  onEditTask={openEditModal}
+                  onDeleteTask={(id) => void handleDelete(id)}
+                />
+              </div>
+            ))}
+          </div>
+          <DragOverlay>
+            {activeTask ? (
+              <div className="rounded-lg border border-indigo-400 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-lg dark:border-indigo-500 dark:bg-slate-800 dark:text-slate-50">
+                {activeTask.title}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </Spin>
 
       <TaskFormModal
         open={isModalOpen}
@@ -279,7 +284,7 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
         }}
         onSubmit={(values) => void handleSubmit(values)}
       />
-    </Spin>
+    </div>
   );
 };
 

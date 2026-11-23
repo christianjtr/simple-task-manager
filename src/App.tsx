@@ -37,7 +37,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
   };
 
   return (
-    <Layout className="min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
+    <Layout className="h-full min-h-0 bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
       <Sider
         theme={theme}
         collapsible
@@ -47,7 +47,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
         collapsedWidth={80}
         trigger={null}
         width={260}
-        className="!bg-white dark:!bg-slate-900"
+        className="!h-full !bg-white dark:!bg-slate-900"
       >
         <Sidebar
           projects={projects}
@@ -60,7 +60,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
         />
       </Sider>
 
-      <Layout className="min-w-0">
+      <Layout className="flex h-full min-h-0 min-w-0 flex-col">
         <Header
           activeProject={activeProject}
           collapsed={collapsed}
@@ -68,7 +68,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
           onToggleSidebar={() => setCollapsed((current) => !current)}
           onToggleTheme={onToggleTheme}
         />
-        <Content className="m-4 min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:m-6 md:p-6">
+        <Content className="m-4 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:m-6 md:p-6">
           {isLoading ? (
             <Skeleton active paragraph={{ rows: 6 }} />
           ) : activeProject ? (
@@ -90,7 +90,7 @@ const App = () => {
 
   return (
     <ConfigProvider locale={enUS} theme={getThemeConfig(theme)}>
-      <AntApp>
+      <AntApp className="h-full">
         <AppShell theme={theme} onToggleTheme={toggleTheme} />
       </AntApp>
     </ConfigProvider>
