@@ -23,7 +23,7 @@ import type { Task, TaskFilters, TaskPriority, TaskStatus } from "@src/features/
 import { filterTasks } from "@src/features/tasks/task.utils";
 import { useTasks } from "@src/hooks/useTasks";
 import { t } from "@src/i18n/en";
-import { Alert, App as AntApp, Button, Spin, Typography } from "antd";
+import { Alert, App as AntApp, Button, Spin, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 
 import { TaskFiltersBar } from "../TaskFiltersBar/TaskFiltersBar";
@@ -31,7 +31,7 @@ import { TaskFormModal, type TaskFormValues, toTaskDueDate } from "../TaskFormMo
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
 import { DEFAULT_STAGES } from "./stages";
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 interface TaskBoardProps {
   projectId: string;
@@ -200,13 +200,21 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="flex min-w-0 items-center gap-2">
           <Title level={4} className="m-0">
             {t("board.tasks")}
           </Title>
-          <Text type="secondary">
-            {tasks.length} {tasks.length === 1 ? t("board.taskSingular") : t("board.taskPlural")}
-          </Text>
+          <Tag
+            data-testid="task-count-chip"
+            className="m-0 rounded-full px-2 tabular-nums"
+            aria-label={
+              tasks.length === 1
+                ? t("board.countAriaOne")
+                : t("board.countAriaOther", { count: tasks.length })
+            }
+          >
+            {tasks.length}
+          </Tag>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
           {t("board.newTask")}

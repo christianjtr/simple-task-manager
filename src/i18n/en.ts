@@ -102,6 +102,8 @@ export const en = {
   },
   board: {
     tasks: "Tasks",
+    countAriaOne: "1 task",
+    countAriaOther: "{count} tasks",
     taskSingular: "task",
     taskPlural: "tasks",
     newTask: "New task",

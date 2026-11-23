@@ -30,7 +30,7 @@ import {
 } from "antd";
 import { useState } from "react";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 interface ProjectFormValues {
   name: string;
@@ -186,9 +186,13 @@ export const Sidebar = ({
           <AppstoreOutlined />
         </span>
         {!collapsed && (
-          <Text strong className="truncate text-slate-900 dark:text-slate-50">
+          <Title
+            level={3}
+            className="m-0 min-w-0 flex-1 truncate font-semibold leading-none tracking-tight text-[var(--content)]"
+            style={{ fontSize: 28 }}
+          >
             {t("sidebar.brand")}
-          </Text>
+          </Title>
         )}
       </div>
 
