@@ -71,9 +71,13 @@ export const BackupActions = () => {
           ],
         }}
       >
-        <Button icon={<DatabaseOutlined />} aria-label={t("backup.data")}>
-          {t("backup.data")}
-        </Button>
+        <Button
+          type="text"
+          shape="circle"
+          icon={<DatabaseOutlined />}
+          title={t("backup.data")}
+          aria-label={t("backup.data")}
+        />
       </Dropdown>
 
       <input

@@ -8,6 +8,8 @@ export const en = {
   header: {
     showProjects: "Show projects",
     hideProjects: "Hide projects",
+    toggleSidebarAria: "Toggle sidebar",
+    toggleThemeAria: "Toggle theme",
     noProject: "No project",
     createProjectPrompt: "Create a project to get started",
     lightMode: "Light mode",

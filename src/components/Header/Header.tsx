@@ -1,17 +1,11 @@
-import {
-  BulbOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  MoonOutlined,
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { BackupActions } from "@src/components/BackupActions/BackupActions";
 import { HelpDrawer } from "@src/components/HelpDrawer/HelpDrawer";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
 import { t } from "@src/i18n/en";
-import { Button, Layout, Space, Tooltip, Typography } from "antd";
+import { Button, Tooltip, Typography } from "antd";
 
-const { Header: AntHeader } = Layout;
 const { Text, Title } = Typography;
 
 interface HeaderProps {
@@ -29,37 +23,44 @@ export const Header = ({
   onToggleSidebar,
   onToggleTheme,
 }: HeaderProps) => (
-  <AntHeader className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 md:px-6">
+  <header
+    className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-4 text-[var(--content)] md:px-6"
+    style={{ backgroundColor: "var(--surface)", color: "var(--content)" }}
+  >
     <div className="flex min-w-0 items-center gap-3">
       <Tooltip title={collapsed ? t("header.showProjects") : t("header.hideProjects")}>
         <Button
           type="text"
-          aria-label="Toggle sidebar"
+          shape="circle"
+          aria-label={t("header.toggleSidebarAria")}
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={onToggleSidebar}
         />
       </Tooltip>
+      <span className="hidden h-8 w-px bg-[var(--border)] sm:block" aria-hidden="true" />
       <div className="min-w-0">
-        <Title level={4} className="m-0 truncate text-slate-900 dark:text-slate-50">
+        <Title level={4} className="m-0 truncate text-[var(--content)]">
           {activeProject?.name ?? t("header.noProject")}
         </Title>
-        <Text type="secondary" className="hidden truncate sm:block">
+        <Text type="secondary" className="hidden truncate text-xs sm:block">
           {activeProject?.description || t("header.createProjectPrompt")}
         </Text>
       </div>
     </div>
 
-    <Space size="middle">
+    <div className="flex shrink-0 items-center gap-1">
       <HelpDrawer />
       <BackupActions />
+      <span className="mx-1 h-6 w-px bg-[var(--border)]" aria-hidden="true" />
       <Tooltip title={theme === "dark" ? t("header.lightMode") : t("header.darkMode")}>
         <Button
           type="text"
-          aria-label="Toggle theme"
-          icon={theme === "dark" ? <BulbOutlined /> : <MoonOutlined />}
+          shape="circle"
+          aria-label={t("header.toggleThemeAria")}
+          icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
           onClick={onToggleTheme}
         />
       </Tooltip>
-    </Space>
-  </AntHeader>
+    </div>
+  </header>
 );
