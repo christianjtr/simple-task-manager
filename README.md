@@ -78,7 +78,7 @@ The `demo` branch is published to GitHub Pages by `.github/workflows/deploy-demo
 - Pull requests targeting `demo` run format/lint, unit tests, and a production build without deploying.
 - Pushes to `demo` and manual dispatches run the same checks, then deploy.
 - `main` is the source of truth; `demo` mirrors it for publishing.
-- The Pages build uses `DEMO_BASE=true` so Vite emits `/simple-task-manager/assets/...` paths.
+- The Pages build sets `DEMO_BASE=true`; Vite derives `/simple-task-manager/assets/...` from `GITHUB_REPOSITORY` in Actions.
 - Repository setting required: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 To publish:
