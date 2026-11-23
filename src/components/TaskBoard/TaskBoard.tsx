@@ -3,12 +3,17 @@ import type { TaskStatus } from "@src/features/tasks/task.types";
 import { useTasks } from "@src/hooks/useTasks";
 import { App as AntApp, Col, Row, Spin } from "antd";
 import { useMemo } from "react";
+
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
 import { DEFAULT_STAGES } from "./stages";
 
-const TaskBoard = () => {
+interface TaskBoardProps {
+  projectId: string;
+}
+
+const TaskBoard = ({ projectId }: TaskBoardProps) => {
   const { message } = AntApp.useApp();
-  const { tasks, isLoading } = useTasks();
+  const { tasks, isLoading } = useTasks({ projectId });
 
   const stages = useMemo(
     () =>
@@ -32,9 +37,9 @@ const TaskBoard = () => {
 
   return (
     <Spin spinning={isLoading && tasks.length === 0}>
-      <Row gutter={[24, 24]}>
+      <Row gutter={[16, 16]}>
         {stages.map((stage) => (
-          <Col key={stage.id} span={24 / stages.length}>
+          <Col key={stage.id} xs={24} md={8}>
             <TaskBoardStage {...stage} onMoveTask={handleMove} />
           </Col>
         ))}

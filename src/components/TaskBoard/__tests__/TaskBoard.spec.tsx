@@ -34,7 +34,7 @@ const task = (id: string, status: TaskStatus): Task => ({
 const renderBoard = () =>
   render(
     <AntApp>
-      <TaskBoard />
+      <TaskBoard projectId="project_1" />
     </AntApp>,
   );
 
@@ -54,6 +54,7 @@ describe("TaskBoard", () => {
   it("always renders the three columns", () => {
     renderBoard();
 
+    expect(mockUseTasks).toHaveBeenCalledWith({ projectId: "project_1" });
     expect(screen.getByTestId("task_board_stage_item_TODO")).toBeInTheDocument();
     expect(screen.getByTestId("task_board_stage_item_IN_PROGRESS")).toBeInTheDocument();
     expect(screen.getByTestId("task_board_stage_item_DONE")).toBeInTheDocument();

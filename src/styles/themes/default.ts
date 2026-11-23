@@ -1,32 +1,40 @@
 import { setTwoToneColor } from "@ant-design/icons";
-import type { ThemeConfig } from "antd";
+import type { ThemeMode } from "@src/hooks/useTheme";
+import { theme as antdTheme, type ThemeConfig } from "antd";
 
-const BRAND_COLOR = "#0284c7";
+const BRAND_COLOR = "#6366f1";
 const WHITE_COLOR = "#ffffff";
 
 setTwoToneColor(BRAND_COLOR);
 
-const defaultTheme: ThemeConfig = {
+const baseTheme: ThemeConfig = {
   hashed: false,
   token: {
     wireframe: false,
     fontSize: 14,
-    borderRadius: 4,
+    borderRadius: 8,
     colorPrimary: BRAND_COLOR,
     colorWhite: WHITE_COLOR,
-    colorTextBase: "#2c3e50",
+    colorTextBase: "#0f172a",
     colorTextSecondary: "#64748b",
     colorBgBase: WHITE_COLOR,
-    colorBgMask: "rgba(26,28,30,0.45)",
+    colorBgMask: "rgba(15,23,42,0.55)",
     colorLink: BRAND_COLOR,
     colorSuccess: "#059669",
     colorWarning: "#d97706",
     colorError: "#dc2626",
     colorInfo: BRAND_COLOR,
-    colorLinkHover: "#0369a1",
+    colorLinkHover: "#4f46e5",
     fontFamily:
-      "system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji','Segoe UI Emoji', 'Segoe UI Symbol'",
+      "Inter, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol'",
   },
 };
 
-export default defaultTheme;
+export function getThemeConfig(mode: ThemeMode): ThemeConfig {
+  return {
+    ...baseTheme,
+    algorithm: mode === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+  };
+}
+
+export default baseTheme;

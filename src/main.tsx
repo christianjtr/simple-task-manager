@@ -1,7 +1,6 @@
-import defaultTheme from "@styles/themes/default";
-import { App as AntApp, ConfigProvider } from "antd";
 import React from "react";
 import ReactDOM from "react-dom/client";
+
 import App from "./App";
 import "./styles/tailwind.css";
 import "./styles/main.scss";
@@ -11,10 +10,6 @@ if (!rootElement) throw new Error("Root element #root not found");
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <ConfigProvider theme={defaultTheme}>
-      <AntApp>
-        <App />
-      </AntApp>
-    </ConfigProvider>
+    <App />
   </React.StrictMode>,
 );
