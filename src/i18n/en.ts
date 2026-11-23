@@ -26,6 +26,7 @@ export const en = {
     storageItem1: "Clearing site data removes projects and tasks.",
     storageItem2: "Storage is subject to the browser quota.",
     storageItem3: "Use JSON export to move or keep a portable copy.",
+    storageItem4: "A workspace can hold up to 50 projects.",
     contractTitle: "JSON backup contract",
     contractText:
       "Exported files are JSON objects with version 1, an exportedAt ISO timestamp, and projects and tasks arrays.",
@@ -41,6 +42,8 @@ export const en = {
   sidebar: {
     brand: "Tasklane",
     projects: "Projects",
+    projectCount: "{count} / {limit}",
+    limitReached: "Maximum 50 projects reached",
     newProject: "New project",
     loadExample: "Load example",
     projectCreated: "Project created",

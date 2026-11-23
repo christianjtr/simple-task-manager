@@ -78,6 +78,7 @@ export const HelpDrawer = () => {
               <li>{t("help.storageItem1")}</li>
               <li>{t("help.storageItem2")}</li>
               <li>{t("help.storageItem3")}</li>
+              <li>{t("help.storageItem4")}</li>
             </ul>
           </section>
 

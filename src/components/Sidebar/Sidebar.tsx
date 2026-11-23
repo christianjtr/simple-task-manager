@@ -8,6 +8,7 @@ import {
   createProject,
   DEFAULT_PROJECT_COLOR,
   deleteProject,
+  MAX_PROJECTS,
 } from "@src/features/tasks/task.repository";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
@@ -60,6 +61,11 @@ export const Sidebar = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleCreate = async (values: ProjectFormValues) => {
+    if (projects.length >= MAX_PROJECTS) {
+      message.warning(t("sidebar.limitReached"));
+      return;
+    }
+
     setIsSaving(true);
     try {
       const project = await createProject({
@@ -122,6 +128,8 @@ export const Sidebar = ({
     ),
   }));
 
+  const atLimit = projects.length >= MAX_PROJECTS;
+
   return (
     <aside className="flex h-full flex-col bg-white dark:bg-slate-900">
       <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
@@ -137,12 +145,14 @@ export const Sidebar = ({
 
       <div className="min-h-0 flex-1 overflow-y-auto py-3">
         {!collapsed && (
-          <Text
-            type="secondary"
-            className="mb-2 block px-4 text-xs font-semibold uppercase tracking-wide"
-          >
-            {t("sidebar.projects")}
-          </Text>
+          <div className="mb-2 flex items-center justify-between gap-2 px-4">
+            <Text type="secondary" className="text-xs font-semibold uppercase tracking-wide">
+              {t("sidebar.projects")}
+            </Text>
+            <Text type="secondary" className="text-xs tabular-nums">
+              {t("sidebar.projectCount", { count: projects.length, limit: MAX_PROJECTS })}
+            </Text>
+          </div>
         )}
         <Menu
           mode="inline"
@@ -160,6 +170,8 @@ export const Sidebar = ({
             type="primary"
             icon={<PlusOutlined />}
             block={!collapsed}
+            disabled={atLimit}
+            title={atLimit ? t("sidebar.limitReached") : undefined}
             aria-label={t("sidebar.newProject")}
             onClick={() => setIsModalOpen(true)}
           >

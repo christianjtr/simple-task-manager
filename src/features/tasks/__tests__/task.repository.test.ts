@@ -10,6 +10,7 @@ import {
   importBackupIntoDb,
   listProjects,
   listTasks,
+  MAX_PROJECTS,
   moveTask,
   reorderTasks,
   updateProject,
@@ -108,5 +109,39 @@ describe("task repository", () => {
     });
     expect(await listProjects()).toHaveLength(1);
     expect(await listTasks()).toHaveLength(1);
+  });
+
+  it("caps project creation at 50", async () => {
+    for (let index = 0; index < MAX_PROJECTS; index += 1) {
+      await createProject({ name: `Project ${index + 1}` });
+    }
+
+    expect(await listProjects()).toHaveLength(MAX_PROJECTS);
+    await expect(createProject({ name: "One too many" })).rejects.toThrow(
+      `Maximum ${MAX_PROJECTS} projects reached`,
+    );
+    expect(await listProjects()).toHaveLength(MAX_PROJECTS);
+  });
+
+  it("rejects imports that would exceed the project cap without writing data", async () => {
+    for (let index = 0; index < MAX_PROJECTS - 1; index += 1) {
+      await createProject({ name: `Project ${index + 1}` });
+    }
+
+    const now = new Date();
+    const extras = [1, 2].map((index) => ({
+      id: `import-${index}`,
+      name: `Imported ${index}`,
+      color: "#112233",
+      description: "",
+      createdAt: now,
+      updatedAt: now,
+    }));
+    const backup = exportBackup(extras, []);
+
+    await expect(importBackupIntoDb(JSON.parse(JSON.stringify(backup)))).rejects.toThrow(
+      `Maximum ${MAX_PROJECTS} projects reached`,
+    );
+    expect(await listProjects()).toHaveLength(MAX_PROJECTS - 1);
   });
 });

@@ -6,6 +6,9 @@ import { type Project, type Task, TaskStatus } from "./task.types";
 import { createId, nextPosition, sortTasks } from "./task.utils";
 
 export const DEFAULT_PROJECT_COLOR = "#6366f1";
+export const MAX_PROJECTS = 50;
+
+const PROJECT_LIMIT_MESSAGE = `Maximum ${MAX_PROJECTS} projects reached`;
 
 export type ProjectInput = Pick<Project, "name"> & Partial<Pick<Project, "color" | "description">>;
 
@@ -21,6 +24,11 @@ export async function listProjects(): Promise<Project[]> {
 export async function importBackupIntoDb(value: unknown): Promise<ImportResult> {
   const result = parseBackup(value);
   await db.transaction("rw", db.projects, db.tasks, async () => {
+    const existingIds = new Set((await db.projects.toCollection().primaryKeys()).map(String));
+    const finalCount =
+      existingIds.size + result.projects.filter((project) => !existingIds.has(project.id)).length;
+    if (finalCount > MAX_PROJECTS) throw new Error(PROJECT_LIMIT_MESSAGE);
+
     await db.projects.bulkPut(result.projects);
     await db.tasks.bulkPut(result.tasks);
   });
@@ -42,7 +50,10 @@ export async function createProject(input: ProjectInput): Promise<Project> {
     updatedAt: now,
   });
 
-  await db.projects.add(project);
+  await db.transaction("rw", db.projects, async () => {
+    if ((await db.projects.count()) >= MAX_PROJECTS) throw new Error(PROJECT_LIMIT_MESSAGE);
+    await db.projects.add(project);
+  });
   return project;
 }
 
