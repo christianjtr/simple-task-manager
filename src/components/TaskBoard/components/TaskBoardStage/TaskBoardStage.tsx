@@ -63,7 +63,7 @@ const TaskBoardStage = ({
           {title}
         </Title>
         <span
-          className={`${styles.count} bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200`}
+          className={styles.count}
           role="img"
           aria-label={
             tasks.length === 1

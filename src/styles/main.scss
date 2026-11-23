@@ -26,7 +26,8 @@ body {
   font-size: $font-size-standard;
   margin: 0;
   line-height: 1.5715;
-  color: $font-color-main-standard;
+  background-color: var(--surface-muted);
+  color: var(--content);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

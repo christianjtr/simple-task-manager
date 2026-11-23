@@ -1,4 +1,3 @@
-@use "sass:color";
 @use "@styles/tokens" as *;
 
 .cardWrapper {
@@ -13,13 +12,13 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: $font-color-support-standard;
+  color: var(--content-muted);
   cursor: grab;
 
   &:hover,
   &:focus-visible {
-    background: $background-color-hover-standard;
-    color: $interaction-color-action;
+    background: var(--surface-hover);
+    color: var(--brand-strong);
     outline: none;
   }
 
@@ -36,11 +35,11 @@
   user-select: none;
 
   &:hover {
-    background-color: $background-color-hover-standard;
+    background-color: var(--surface-hover);
   }
 
   &:active {
-    background-color: color.adjust($interaction-color-action, $lightness: 50%);
+    background-color: var(--brand-soft);
   }
 }
 
