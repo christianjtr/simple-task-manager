@@ -209,7 +209,7 @@ export const Sidebar = ({
               <Title
                 level={3}
                 className="m-0 min-w-0 truncate font-semibold tracking-tight text-[var(--content)]"
-                style={{ fontSize: 28, lineHeight: 1, marginBottom: 0 }}
+                style={{ fontSize: 24, lineHeight: 1, marginBottom: 0 }}
               >
                 {t("sidebar.brand")}
               </Title>
