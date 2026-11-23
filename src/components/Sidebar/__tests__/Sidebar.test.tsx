@@ -53,6 +53,7 @@ describe("Sidebar", () => {
       fontSize: "28px",
       marginBottom: "0px",
     });
+    expect(screen.getByTestId("sidebar-brand-bar")).not.toHaveClass("border-b");
     expect(screen.getByTestId("sidebar-brand")).toHaveClass("items-center");
     expect(screen.getByTestId("sidebar-version")).toHaveTextContent("v1");
     expect(screen.getByText("50 / 50")).toBeInTheDocument();

@@ -12,6 +12,21 @@ test("loads the app shell with icon-only header actions", async ({ page }) => {
   await page.getByRole("button", { name: "Data" }).hover();
   await expect(page.getByRole("tooltip")).toHaveText("Data export/import");
 
+  const sider = page.getByTestId("app-sider");
+  const brandBar = page.getByTestId("sidebar-brand-bar");
+  const siderBox = await sider.boundingBox();
+  const headerBox = await page.locator("header").boundingBox();
+  const brandBarBox = await brandBar.boundingBox();
+  expect(siderBox).not.toBeNull();
+  expect(headerBox).not.toBeNull();
+  expect(brandBarBox).not.toBeNull();
+  if (!siderBox || !headerBox || !brandBarBox) throw new Error("Shell geometry unavailable");
+  expect(headerBox.x).toBeGreaterThanOrEqual(siderBox.x + siderBox.width - 1);
+  expect(brandBarBox.x).toBeGreaterThanOrEqual(siderBox.x - 1);
+  expect(brandBarBox.x + brandBarBox.width).toBeLessThanOrEqual(siderBox.x + siderBox.width + 1);
+  await expect(sider).toHaveClass(/border-r/);
+  await expect(brandBar).not.toHaveClass(/border-b/);
+
   const sidebarToggle = page.getByRole("button", { name: "Toggle sidebar" });
   await expect(sidebarToggle.locator('[data-icon="double-left"]')).toBeVisible();
   await sidebarToggle.click();

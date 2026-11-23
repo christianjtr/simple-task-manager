@@ -185,11 +185,10 @@ export const Sidebar = ({
   const atLimit = projects.length >= MAX_PROJECTS;
 
   return (
-    <aside className="flex h-full min-h-0 flex-col bg-white dark:bg-slate-900">
+    <aside className="flex h-full min-h-0 flex-col bg-[var(--surface-muted)]">
       <div
-        className={`flex h-16 items-center gap-2 border-b border-[var(--border)] ${
-          collapsed ? "justify-center px-2" : "px-3"
-        }`}
+        data-testid="sidebar-brand-bar"
+        className={`flex h-16 items-center gap-2 ${collapsed ? "justify-center px-2" : "px-3"}`}
       >
         <Tooltip title={collapsed ? t("sidebar.showProjects") : t("sidebar.hideProjects")}>
           <Button

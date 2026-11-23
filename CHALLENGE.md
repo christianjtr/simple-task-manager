@@ -146,6 +146,7 @@ The repository was later modernized from the original mock real-time challenge i
 - Keep header actions icon-only and consistently grouped around the project title.
 - Share one indigo accent palette across CSS tokens and Ant Design themes in both modes.
 - Align the full-height shell, header metadata, project brand, and task count chip.
+- Keep the sidebar a distinct full-height panel with the header starting to its right, not visually spanning it.
 - Show the project version as a `v1` badge beside the brand without adding a footer.
 - Move task metadata below the title and expose actions through a distinct contextual menu.
 - Clamp long descriptions with an explicit expand/collapse control.
@@ -196,3 +197,4 @@ Refinement stages:
 23. `refinement/23-taskcard-actions` — task card contextual menu, expandable description, and date under title.
 24. `refinement/24-final-qa-docs` — updated documentation and final verification gate.
 25. `refinement/25-brand-version-badge` — added the `v1` badge beside the sidebar brand.
+26. `refinement/26-sidebar-header-separation` — separated the sidebar panel from the right-side header.

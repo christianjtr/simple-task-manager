@@ -39,6 +39,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
   return (
     <Layout className="h-full min-h-0 bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
       <Sider
+        data-testid="app-sider"
         theme={theme}
         collapsible
         collapsed={collapsed}
@@ -47,7 +48,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
         collapsedWidth={80}
         trigger={null}
         width={260}
-        className="!h-full !min-h-0 !bg-white dark:!bg-slate-900"
+        className="!h-full !min-h-0 !border-r !border-[var(--border)] !bg-[var(--surface-muted)]"
       >
         <Sidebar
           projects={projects}

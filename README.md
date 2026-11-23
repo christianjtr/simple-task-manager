@@ -90,7 +90,7 @@ Key pieces:
 - `src/hooks/useActiveProject.ts` / `src/hooks/useTheme.ts`: persisted UI preferences.
 - `src/components/Header/Header.tsx`: sticky top bar with project title and description separated by a vertical rule, plus ordered Help/Data/Theme icon actions.
 - `src/components/HelpDrawer/HelpDrawer.tsx`: storage limits, JSON contract, and import behavior.
-- `src/components/Sidebar/Sidebar.tsx`: full-height project navigation, `Tasklane v1` brand badge, top double-chevron collapse control, `N / 50` counter, 3-point Edit/Delete menu, and creation limit UI.
+- `src/components/Sidebar/Sidebar.tsx`: full-height project panel with `Tasklane v1` brand badge, top double-chevron collapse control, `N / 50` counter, 3-point Edit/Delete menu, and creation limit UI.
 - `src/components/BackupActions/BackupActions.tsx`: JSON export/import UI.
 - `src/components/TaskBoard/TaskBoard.tsx`: task count chip, filters, CRUD actions, and dnd-kit context.
 - `src/components/TaskBoard/components/TaskBoardStage/TaskBoardStage.tsx`: droppable columns.
@@ -130,7 +130,7 @@ Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/s
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in seventeen more, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in eighteen more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -166,7 +166,8 @@ Refinements continued in dedicated branches:
 | 22    | `refinement/22-layout-alignment-seed`         | `462006c` | Full-height shell, centered alignment, Data tooltip, seed |
 | 23    | `refinement/23-taskcard-actions`              | `28626d3` | Task card menu, description toggle, and date under title  |
 | 24    | `refinement/24-final-qa-docs`                 | `f296499` | Updated documentation and final verification gate         |
-| 25    | `refinement/25-brand-version-badge`           | current   | Added `v1` badge beside the sidebar brand                 |
+| 25    | `refinement/25-brand-version-badge`           | `71a2257` | Added `v1` badge beside the sidebar brand                 |
+| 26    | `refinement/26-sidebar-header-separation`     | current   | Separated the sidebar panel from the right-side header    |
 
 Notable decisions:
 
@@ -178,6 +179,7 @@ Notable decisions:
 - Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
 - The sidebar collapse state is intentionally session-only; it is not persisted.
 - The header remains a separate sticky top bar outside the task panel; collapse is controlled only from the sidebar.
+- The sidebar is a distinct full-height panel with muted surface, right border, and no bottom rule on the brand block; the header starts to its right.
 - The brand badge shows the project version as `v1` beside `Tasklane`; there is no footer.
 - Task descriptions longer than 140 characters clamp to two lines with `Show more` / `Show less`.
 - Task actions use a circular outlined ellipsis button, visually distinct from the drag handle.
