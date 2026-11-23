@@ -94,7 +94,7 @@ Key pieces:
 - `src/components/BackupActions/BackupActions.tsx`: JSON export/import UI.
 - `src/components/TaskBoard/TaskBoard.tsx`: task count chip, filters, CRUD actions, and dnd-kit context.
 - `src/components/TaskBoard/components/TaskBoardStage/TaskBoardStage.tsx`: droppable columns.
-- `src/components/TaskBoard/components/TaskCard/TaskCard.tsx`: sortable cards and keyboard handle.
+- `src/components/TaskBoard/components/TaskCard/TaskCard.tsx`: sortable cards with a distinct drag handle, contextual Edit/Delete menu, compact description toggle, and metadata under the title.
 
 Domain values use `Date` objects. At the JSON boundary they are serialized as ISO strings and validated with Zod. `useLiveQuery` returns `undefined` during the first load, so hooks normalize reads to empty arrays.
 
@@ -116,7 +116,7 @@ Import uses `bulkPut`, so an incoming ID replaces an existing local record with 
 
 ## Testing
 
-The suite currently contains 42 tests across 13 files.
+The suite currently contains 47 tests across 14 files and 3 Playwright smoke tests.
 
 ```shell
 pnpm check
@@ -130,7 +130,7 @@ Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/s
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in thirteen more, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in sixteen more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -162,7 +162,10 @@ Refinements continued in dedicated branches:
 | 18    | `refinement/18-final-qa-docs`                 | `a33facf` | Updated documentation and full verification gate          |
 | 19    | `refinement/19-task-chip-brand-title`         | `65e7f27` | Task count chip and larger `Tasklane` brand               |
 | 20    | `refinement/20-sidebar-trigger-inline-header` | `28d8160` | In-sidebar collapse toggle and sticky project header      |
-| 21    | `refinement/21-final-qa-docs`                 | current   | Final documentation and full verification gate            |
+| 21    | `refinement/21-final-qa-docs`                 | `24c5c29` | Final documentation and full verification gate            |
+| 22    | `refinement/22-layout-alignment-seed`         | `462006c` | Full-height shell, centered alignment, Data tooltip, seed |
+| 23    | `refinement/23-taskcard-actions`              | `28626d3` | Task card menu, description toggle, and date under title  |
+| 24    | `refinement/24-final-qa-docs`                 | current   | Updated documentation and final verification gate         |
 
 Notable decisions:
 
@@ -174,6 +177,10 @@ Notable decisions:
 - Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
 - The sidebar collapse state is intentionally session-only; it is not persisted.
 - The header remains a separate sticky top bar outside the task panel; collapse is controlled only from the sidebar.
+- Task descriptions longer than 140 characters clamp to two lines with `Show more` / `Show less`.
+- Task actions use a circular outlined ellipsis button, visually distinct from the drag handle.
+- Task tags sit directly below the description without a divider.
+- The Data header action uses an Ant Design tooltip reading `Data export/import`.
 - GitHub Pages builds use `DEMO_BASE=true` to set the Vite base path to `/simple-task-manager/`.
 
 ## Demo deployment

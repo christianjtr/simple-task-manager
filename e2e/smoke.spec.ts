@@ -29,3 +29,19 @@ test("opens the project context menu", async ({ page }) => {
   await expect(page.getByRole("menuitem", { name: "Edit project" })).toBeVisible();
   await expect(page.getByRole("menuitem", { name: "Delete" })).toBeVisible();
 });
+
+test("opens the task context menu with distinct action and drag icons", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Load example" }).first().click();
+  await expect(page.getByRole("heading", { name: "Example project" })).toBeVisible();
+
+  const taskActions = page.getByRole("button", { name: "Actions for Define scope" });
+  await expect(taskActions.locator(".anticon-ellipsis")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Drag Define scope" }).locator(".anticon-drag"),
+  ).toBeVisible();
+
+  await taskActions.click();
+  await expect(page.getByRole("menuitem", { name: /edit/i })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: /delete/i })).toBeVisible();
+});

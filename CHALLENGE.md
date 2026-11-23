@@ -145,6 +145,9 @@ The repository was later modernized from the original mock real-time challenge i
 - Manage projects from a 3-point menu with edit (name, description, color) and confirmed delete.
 - Keep header actions icon-only and consistently grouped around the project title.
 - Share one indigo accent palette across CSS tokens and Ant Design themes in both modes.
+- Align the full-height shell, header metadata, project brand, and task count chip.
+- Move task metadata below the title and expose actions through a distinct contextual menu.
+- Clamp long descriptions with an explicit expand/collapse control.
 
 ### Requirement mapping
 
@@ -155,7 +158,7 @@ The repository was later modernized from the original mock real-time challenge i
 | Mock realtime WebSocket         | Removed. `useLiveQuery` reacts to local Dexie writes.                                                                                |
 | Redux state                     | Removed. Hooks and the task repository own reads and mutations.                                                                      |
 | Native drag-and-drop            | Replaced by dnd-kit with `DragOverlay` and keyboard announcements.                                                                   |
-| `OptimizedImage`                | Removed; cards focus on title, description, priority, due date, and tags.                                                            |
+| `OptimizedImage`                | Removed; cards focus on title, metadata, priority, description, tags, and contextual actions.                                        |
 | API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI.                                                      |
 | Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus Playwright smoke tests.                                                              |
 | Type-checked production build   | `pnpm build` runs `tsc -b` before Vite.                                                                                              |
@@ -188,3 +191,6 @@ Refinement stages:
 19. `refinement/19-task-chip-brand-title` — task count chip and larger `Tasklane` brand.
 20. `refinement/20-sidebar-trigger-inline-header` — in-sidebar collapse control and sticky project header.
 21. `refinement/21-final-qa-docs` — final documentation and full verification gate.
+22. `refinement/22-layout-alignment-seed` — full-height shell alignment, Data tooltip, and longer English seed.
+23. `refinement/23-taskcard-actions` — task card contextual menu, expandable description, and date under title.
+24. `refinement/24-final-qa-docs` — updated documentation and final verification gate.
