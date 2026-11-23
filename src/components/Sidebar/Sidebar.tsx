@@ -241,7 +241,7 @@ export const Sidebar = ({
           selectedKeys={activeProjectId ? [activeProjectId] : []}
           items={items}
           onClick={({ key }) => onSelectProject(key)}
-          className="border-0 bg-transparent"
+          className="border-0 !bg-[var(--surface-muted)]"
         />
       </div>
 

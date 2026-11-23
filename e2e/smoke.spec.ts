@@ -26,6 +26,11 @@ test("loads the app shell with icon-only header actions", async ({ page }) => {
   expect(brandBarBox.x + brandBarBox.width).toBeLessThanOrEqual(siderBox.x + siderBox.width + 1);
   await expect(sider).toHaveClass(/border-r/);
   await expect(brandBar).not.toHaveClass(/border-b/);
+  const siderBg = await sider.evaluate((el) => getComputedStyle(el).backgroundColor);
+  const menuBg = await page
+    .locator(".ant-menu-root")
+    .evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(menuBg).toBe(siderBg);
 
   const sidebarToggle = page.getByRole("button", { name: "Toggle sidebar" });
   await expect(sidebarToggle.locator('[data-icon="double-left"]')).toBeVisible();

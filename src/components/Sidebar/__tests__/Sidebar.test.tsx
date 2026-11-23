@@ -50,7 +50,7 @@ describe("Sidebar", () => {
     renderSidebar(projects);
 
     expect(screen.getByRole("heading", { name: "Tasklane" })).toHaveStyle({
-      fontSize: "28px",
+      fontSize: "24px",
       marginBottom: "0px",
     });
     expect(screen.getByTestId("sidebar-brand-bar")).not.toHaveClass("border-b");

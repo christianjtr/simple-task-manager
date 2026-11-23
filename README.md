@@ -130,7 +130,7 @@ Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/s
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in eighteen more, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in nineteen more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -167,7 +167,8 @@ Refinements continued in dedicated branches:
 | 23    | `refinement/23-taskcard-actions`              | `28626d3` | Task card menu, description toggle, and date under title  |
 | 24    | `refinement/24-final-qa-docs`                 | `f296499` | Updated documentation and final verification gate         |
 | 25    | `refinement/25-brand-version-badge`           | `71a2257` | Added `v1` badge beside the sidebar brand                 |
-| 26    | `refinement/26-sidebar-header-separation`     | current   | Separated the sidebar panel from the right-side header    |
+| 26    | `refinement/26-sidebar-header-separation`     | `5d86bee` | Separated the sidebar panel from the right-side header    |
+| 27    | `refinement/27-sidebar-uniform-background`    | current   | Unified the sidebar menu background and brand font size   |
 
 Notable decisions:
 
@@ -179,7 +180,7 @@ Notable decisions:
 - Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
 - The sidebar collapse state is intentionally session-only; it is not persisted.
 - The header remains a separate sticky top bar outside the task panel; collapse is controlled only from the sidebar.
-- The sidebar is a distinct full-height panel with muted surface, right border, and no bottom rule on the brand block; the header starts to its right.
+- The sidebar is a distinct full-height panel with one muted surface, right border, and no bottom rule on the brand block; the header starts to its right.
 - The brand badge shows the project version as `v1` beside `Tasklane`; there is no footer.
 - Task descriptions longer than 140 characters clamp to two lines with `Show more` / `Show less`.
 - Task actions use a circular outlined ellipsis button, visually distinct from the drag handle.
