@@ -13,6 +13,31 @@ export const en = {
     lightMode: "Light mode",
     darkMode: "Dark mode",
   },
+  help: {
+    buttonAria: "Help",
+    buttonTooltip: "Help and data information",
+    title: "Help",
+    close: "Close",
+    aboutTitle: "About Tasklane",
+    aboutText:
+      "Tasklane is a local-first Kanban board. Projects and tasks stay in this browser; there is no account, server, or realtime sync.",
+    storageTitle: "Storage and limitations",
+    storageText: "Data is saved in IndexedDB, scoped to this browser and origin.",
+    storageItem1: "Clearing site data removes projects and tasks.",
+    storageItem2: "Storage is subject to the browser quota.",
+    storageItem3: "Use JSON export to move or keep a portable copy.",
+    contractTitle: "JSON backup contract",
+    contractText:
+      "Exported files are JSON objects with version 1, an exportedAt ISO timestamp, and projects and tasks arrays.",
+    exampleLabel: "Example shape",
+    contractValues:
+      "Status is TODO, IN_PROGRESS or DONE. Priority is low, medium or high. Dates use ISO 8601 strings.",
+    rulesTitle: "Import behavior",
+    rulesItem1: "Invalid files are rejected before any data is written.",
+    rulesItem2: "Records are matched by id; existing records with the same id are replaced.",
+    rulesItem3: "Duplicate ids and tasks whose project is missing are skipped.",
+    rulesItem4: "Import does not delete existing projects or tasks.",
+  },
   sidebar: {
     brand: "Tasklane",
     projects: "Projects",

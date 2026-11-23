@@ -5,6 +5,7 @@ import {
   MoonOutlined,
 } from "@ant-design/icons";
 import { BackupActions } from "@src/components/BackupActions/BackupActions";
+import { HelpDrawer } from "@src/components/HelpDrawer/HelpDrawer";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
 import { t } from "@src/i18n/en";
@@ -49,6 +50,7 @@ export const Header = ({
     </div>
 
     <Space size="middle">
+      <HelpDrawer />
       <BackupActions />
       <Tooltip title={theme === "dark" ? t("header.lightMode") : t("header.darkMode")}>
         <Button
