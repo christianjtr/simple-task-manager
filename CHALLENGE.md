@@ -2,8 +2,6 @@
 
 This task is designed to assess your technical expertise, problem-solving skills, and ability to deliver efficient and polished solutions within a limited time.
 
-![Task Management System Interface](./assets/task-manager-system.png)
-
 ---
 
 ## Your Task
@@ -199,3 +197,4 @@ Refinement stages:
 25. `refinement/25-brand-version-badge` — added the `v1` badge beside the sidebar brand.
 26. `refinement/26-sidebar-header-separation` — separated the sidebar panel from the right-side header.
 27. `refinement/27-sidebar-uniform-background` — unified the sidebar menu background and brand font size.
+28. `refinement/28-readme-cleanup-pages-version` — derived version from `package.json`, validated demo PRs, removed obsolete assets, and refreshed documentation.

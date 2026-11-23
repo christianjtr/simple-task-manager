@@ -40,7 +40,6 @@ export const en = {
   },
   sidebar: {
     brand: "Tasklane",
-    version: "v1",
     showProjects: "Show projects",
     hideProjects: "Hide projects",
     toggleSidebarAria: "Toggle sidebar",

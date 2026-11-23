@@ -1,3 +1,4 @@
+import { APP_VERSION } from "@src/appVersion";
 import { db } from "@src/db/database";
 import { createProject, getProject, MAX_PROJECTS } from "@src/features/tasks/task.repository";
 import type { Project } from "@src/features/tasks/task.types";
@@ -55,7 +56,7 @@ describe("Sidebar", () => {
     });
     expect(screen.getByTestId("sidebar-brand-bar")).not.toHaveClass("border-b");
     expect(screen.getByTestId("sidebar-brand")).toHaveClass("items-center");
-    expect(screen.getByTestId("sidebar-version")).toHaveTextContent("v1");
+    expect(screen.getByTestId("sidebar-version")).toHaveTextContent(APP_VERSION);
     expect(screen.getByText("50 / 50")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "New project" })).toBeDisabled();
   });

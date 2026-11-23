@@ -3,6 +3,8 @@ name: Deploy demo to GitHub Pages
 on:
   push:
     branches: [demo]
+  pull_request:
+    branches: [demo]
   workflow_dispatch:
 
 permissions:
@@ -18,10 +20,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout demo branch
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
-          ref: demo
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'demo' }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -35,6 +37,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check formatting and lint
+        run: pnpm check
+
+      - name: Run unit tests
+        run: pnpm test
+
       - name: Build for GitHub Pages
         run: pnpm build
         env:
@@ -46,6 +54,7 @@ jobs:
           path: dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

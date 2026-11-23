@@ -1,7 +1,7 @@
 {
   "name": "simple-task-manager",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "author": "Christian Torrealba",
   "packageManager": "pnpm@12.9.1",

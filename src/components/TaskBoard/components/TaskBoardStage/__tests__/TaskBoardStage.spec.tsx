@@ -5,10 +5,6 @@ import { App as AntApp } from "antd";
 import { vi } from "vitest";
 import { TaskBoardStage } from "../TaskBoardStage";
 
-vi.mock("@components/OptimizedImage/OptimizedImage", () => ({
-  OptimizedImage: () => <div data-testid="optimized-image" />,
-}));
-
 const task = (id: string, status: TaskStatus): Task => ({
   id: `task-${id}`,
   projectId: "project_1",

@@ -8,6 +8,7 @@ import {
   PlusOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
+import { APP_VERSION } from "@src/appVersion";
 import {
   createProject,
   DEFAULT_PROJECT_COLOR,
@@ -217,7 +218,7 @@ export const Sidebar = ({
                 data-testid="sidebar-version"
                 className="shrink-0 rounded-full bg-[var(--brand-soft)] px-2 py-0.5 text-[10px] font-semibold leading-none text-[var(--brand-strong)]"
               >
-                {t("sidebar.version")}
+                {APP_VERSION}
               </span>
             </div>
           </>
