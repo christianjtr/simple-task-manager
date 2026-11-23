@@ -1,6 +1,8 @@
 import {
   AppstoreOutlined,
   DeleteOutlined,
+  DoubleLeftOutlined,
+  DoubleRightOutlined,
   EditOutlined,
   MoreOutlined,
   PlusOutlined,
@@ -26,6 +28,7 @@ import {
   type MenuProps,
   Modal,
   Space,
+  Tooltip,
   Typography,
 } from "antd";
 import { useState } from "react";
@@ -46,6 +49,7 @@ interface SidebarProps {
   isLoading?: boolean;
   onSelectProject: (id: string) => void;
   onLoadExample: () => void;
+  onToggleSidebar: () => void;
 }
 
 export const Sidebar = ({
@@ -56,6 +60,7 @@ export const Sidebar = ({
   isLoading,
   onSelectProject,
   onLoadExample,
+  onToggleSidebar,
 }: SidebarProps) => {
   const { message, modal } = AntApp.useApp();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -181,18 +186,34 @@ export const Sidebar = ({
 
   return (
     <aside className="flex h-full flex-col bg-white dark:bg-slate-900">
-      <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
-        <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--brand)] text-white">
-          <AppstoreOutlined />
-        </span>
+      <div
+        className={`flex h-16 items-center gap-2 border-b border-[var(--border)] ${
+          collapsed ? "justify-center px-2" : "px-3"
+        }`}
+      >
+        <Tooltip title={collapsed ? t("sidebar.showProjects") : t("sidebar.hideProjects")}>
+          <Button
+            type="text"
+            shape="circle"
+            icon={collapsed ? <DoubleRightOutlined /> : <DoubleLeftOutlined />}
+            title={collapsed ? t("sidebar.showProjects") : t("sidebar.hideProjects")}
+            aria-label={t("sidebar.toggleSidebarAria")}
+            onClick={onToggleSidebar}
+          />
+        </Tooltip>
         {!collapsed && (
-          <Title
-            level={3}
-            className="m-0 min-w-0 flex-1 truncate font-semibold leading-none tracking-tight text-[var(--content)]"
-            style={{ fontSize: 28 }}
-          >
-            {t("sidebar.brand")}
-          </Title>
+          <>
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--brand)] text-white">
+              <AppstoreOutlined />
+            </span>
+            <Title
+              level={3}
+              className="m-0 min-w-0 flex-1 truncate font-semibold leading-none tracking-tight text-[var(--content)]"
+              style={{ fontSize: 28 }}
+            >
+              {t("sidebar.brand")}
+            </Title>
+          </>
         )}
       </div>
 

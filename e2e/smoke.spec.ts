@@ -4,8 +4,16 @@ test("loads the app shell with icon-only header actions", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Tasklane/i);
   await expect(page.locator("#root")).not.toBeEmpty();
-  await expect(page.locator("header button")).toHaveCount(4);
+  await expect(page.locator("header")).toBeVisible();
+  await expect(page.locator("main header")).toHaveCount(0);
+  await expect(page.locator("header button")).toHaveCount(3);
   await expect(page.getByRole("button", { name: "Data" })).toBeEmpty();
+
+  const sidebarToggle = page.getByRole("button", { name: "Toggle sidebar" });
+  await expect(sidebarToggle.locator('[data-icon="double-left"]')).toBeVisible();
+  await sidebarToggle.click();
+  await expect(sidebarToggle.locator('[data-icon="double-right"]')).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tasklane" })).toHaveCount(0);
 });
 
 test("opens the project context menu", async ({ page }) => {

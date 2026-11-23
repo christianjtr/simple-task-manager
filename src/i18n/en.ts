@@ -6,9 +6,6 @@ export const en = {
     exampleLoadFailed: "Could not load the example",
   },
   header: {
-    showProjects: "Show projects",
-    hideProjects: "Hide projects",
-    toggleSidebarAria: "Toggle sidebar",
     toggleThemeAria: "Toggle theme",
     noProject: "No project",
     createProjectPrompt: "Create a project to get started",
@@ -43,6 +40,9 @@ export const en = {
   },
   sidebar: {
     brand: "Tasklane",
+    showProjects: "Show projects",
+    hideProjects: "Hide projects",
+    toggleSidebarAria: "Toggle sidebar",
     projects: "Projects",
     projectCount: "{count} / {limit}",
     limitReached: "Maximum 50 projects reached",

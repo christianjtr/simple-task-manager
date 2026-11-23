@@ -35,13 +35,7 @@ const activeProject: Project = {
 const renderHeader = (theme: "light" | "dark" = "light", onToggleTheme = vi.fn()) => {
   render(
     <AntApp>
-      <Header
-        activeProject={activeProject}
-        collapsed={false}
-        theme={theme}
-        onToggleSidebar={vi.fn()}
-        onToggleTheme={onToggleTheme}
-      />
+      <Header activeProject={activeProject} theme={theme} onToggleTheme={onToggleTheme} />
     </AntApp>,
   );
   return { onToggleTheme };
@@ -68,9 +62,11 @@ describe("Header", () => {
     expect(screen.getByRole("banner")).toHaveClass("bg-[var(--surface)]");
     expect(
       screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
-    ).toEqual(["Toggle sidebar", "Help", "Data", "Toggle theme"]);
+    ).toEqual(["Help", "Data", "Toggle theme"]);
     expect(screen.queryByText("Data")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Work" })).toBeInTheDocument();
+    expect(screen.getByTestId("header-project-separator")).toBeInTheDocument();
+    expect(screen.getByText("Project description")).toBeInTheDocument();
   });
 
   it("uses the sun icon in dark mode and toggles the theme", () => {

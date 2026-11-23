@@ -57,17 +57,12 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
           isLoading={isSeeding}
           onSelectProject={setActiveProject}
           onLoadExample={() => void handleLoadExample()}
+          onToggleSidebar={() => setCollapsed((current) => !current)}
         />
       </Sider>
 
       <Layout className="flex h-full min-h-0 min-w-0 flex-col">
-        <Header
-          activeProject={activeProject}
-          collapsed={collapsed}
-          theme={theme}
-          onToggleSidebar={() => setCollapsed((current) => !current)}
-          onToggleTheme={onToggleTheme}
-        />
+        <Header activeProject={activeProject} theme={theme} onToggleTheme={onToggleTheme} />
         <Content className="m-4 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:m-6 md:p-6">
           {isLoading ? (
             <Skeleton active paragraph={{ rows: 6 }} />
@@ -76,7 +71,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
           ) : (
             <ProjectEmptyState
               onLoadExample={() => void handleLoadExample()}
-              isLoading={isSeeding}
+              isLoading={isLoading}
             />
           )}
         </Content>

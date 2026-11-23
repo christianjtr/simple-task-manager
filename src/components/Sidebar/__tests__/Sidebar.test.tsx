@@ -24,19 +24,25 @@ afterAll(() => {
   db.close();
 });
 
-const renderSidebar = (items: Project[], onSelectProject = vi.fn()) => {
+const renderSidebar = (
+  items: Project[],
+  onSelectProject = vi.fn(),
+  collapsed = false,
+  onToggleSidebar = vi.fn(),
+) => {
   render(
     <AntApp>
       <Sidebar
         projects={items}
-        collapsed={false}
+        collapsed={collapsed}
         theme="light"
         onSelectProject={onSelectProject}
         onLoadExample={vi.fn()}
+        onToggleSidebar={onToggleSidebar}
       />
     </AntApp>,
   );
-  return { onSelectProject };
+  return { onSelectProject, onToggleSidebar };
 };
 
 describe("Sidebar", () => {
@@ -46,6 +52,26 @@ describe("Sidebar", () => {
     expect(screen.getByRole("heading", { name: "Tasklane" })).toHaveStyle({ fontSize: "28px" });
     expect(screen.getByText("50 / 50")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "New project" })).toBeDisabled();
+  });
+
+  it("toggles the sidebar from the top control with a collapse chevron", () => {
+    const { onToggleSidebar } = renderSidebar([], vi.fn(), false, vi.fn());
+    const toggle = screen.getByRole("button", { name: "Toggle sidebar" });
+
+    expect(toggle.querySelector('[data-icon="double-left"]')).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(onToggleSidebar).toHaveBeenCalledOnce();
+  });
+
+  it("shows an expand chevron and hides the brand when collapsed", () => {
+    renderSidebar([], vi.fn(), true, vi.fn());
+
+    expect(
+      screen
+        .getByRole("button", { name: "Toggle sidebar" })
+        .querySelector('[data-icon="double-right"]'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Tasklane" })).not.toBeInTheDocument();
   });
 
   it("edits a project from its context menu without selecting it", async () => {

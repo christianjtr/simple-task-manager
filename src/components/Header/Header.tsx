@@ -1,4 +1,4 @@
-import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { BackupActions } from "@src/components/BackupActions/BackupActions";
 import { HelpDrawer } from "@src/components/HelpDrawer/HelpDrawer";
 import type { Project } from "@src/features/tasks/task.types";
@@ -10,42 +10,29 @@ const { Text, Title } = Typography;
 
 interface HeaderProps {
   activeProject: Project | null;
-  collapsed: boolean;
   theme: ThemeMode;
-  onToggleSidebar: () => void;
   onToggleTheme: () => void;
 }
 
-export const Header = ({
-  activeProject,
-  collapsed,
-  theme,
-  onToggleSidebar,
-  onToggleTheme,
-}: HeaderProps) => (
+export const Header = ({ activeProject, theme, onToggleTheme }: HeaderProps) => (
   <header
-    className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-4 text-[var(--content)] md:px-6"
+    className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-4 text-[var(--content)] md:px-6"
     style={{ backgroundColor: "var(--surface)", color: "var(--content)" }}
   >
-    <div className="flex min-w-0 items-center gap-3">
-      <Tooltip title={collapsed ? t("header.showProjects") : t("header.hideProjects")}>
-        <Button
-          type="text"
-          shape="circle"
-          aria-label={t("header.toggleSidebarAria")}
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={onToggleSidebar}
+    <div className="flex min-w-0 flex-1 items-baseline gap-2">
+      <Title level={4} className="m-0 shrink-0 truncate text-[var(--content)]">
+        {activeProject?.name ?? t("header.noProject")}
+      </Title>
+      <span className="hidden min-w-0 items-center gap-2 sm:flex">
+        <span
+          aria-hidden="true"
+          data-testid="header-project-separator"
+          className="h-4 w-px shrink-0 bg-[var(--border)]"
         />
-      </Tooltip>
-      <span className="hidden h-8 w-px bg-[var(--border)] sm:block" aria-hidden="true" />
-      <div className="min-w-0">
-        <Title level={4} className="m-0 truncate text-[var(--content)]">
-          {activeProject?.name ?? t("header.noProject")}
-        </Title>
-        <Text type="secondary" className="hidden truncate text-xs sm:block">
+        <Text type="secondary" className="min-w-0 truncate text-xs">
           {activeProject?.description || t("header.createProjectPrompt")}
         </Text>
-      </div>
+      </span>
     </div>
 
     <div className="flex shrink-0 items-center gap-1">
