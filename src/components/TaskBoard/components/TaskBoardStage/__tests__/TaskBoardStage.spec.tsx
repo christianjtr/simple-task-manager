@@ -1,6 +1,7 @@
 import { DndContext } from "@dnd-kit/core";
 import { type Task, TaskStatus } from "@src/features/tasks/task.types";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { App as AntApp } from "antd";
 import { vi } from "vitest";
 import { TaskBoardStage } from "../TaskBoardStage";
 
@@ -25,15 +26,17 @@ const onMoveTask = vi.fn().mockResolvedValue(undefined);
 
 const renderStage = (tasks: Task[], status = TaskStatus.TODO) =>
   render(
-    <DndContext>
-      <TaskBoardStage
-        id={status}
-        title="To Do"
-        status={status}
-        tasks={tasks}
-        onMoveTask={onMoveTask}
-      />
-    </DndContext>,
+    <AntApp>
+      <DndContext>
+        <TaskBoardStage
+          id={status}
+          title="To Do"
+          status={status}
+          tasks={tasks}
+          onMoveTask={onMoveTask}
+        />
+      </DndContext>
+    </AntApp>,
   );
 
 describe("TaskBoardStage", () => {
