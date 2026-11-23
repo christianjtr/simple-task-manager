@@ -54,6 +54,7 @@ describe("Sidebar", () => {
       marginBottom: "0px",
     });
     expect(screen.getByTestId("sidebar-brand")).toHaveClass("items-center");
+    expect(screen.getByTestId("sidebar-version")).toHaveTextContent("v1");
     expect(screen.getByText("50 / 50")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "New project" })).toBeDisabled();
   });
@@ -76,6 +77,7 @@ describe("Sidebar", () => {
         .querySelector('[data-icon="double-right"]'),
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Tasklane" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("sidebar-version")).not.toBeInTheDocument();
   });
 
   it("edits a project from its context menu without selecting it", async () => {

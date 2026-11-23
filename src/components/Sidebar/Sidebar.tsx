@@ -206,7 +206,7 @@ export const Sidebar = ({
             <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--brand)] text-white">
               <AppstoreOutlined />
             </span>
-            <div data-testid="sidebar-brand" className="flex min-w-0 flex-1 items-center">
+            <div data-testid="sidebar-brand" className="flex min-w-0 flex-1 items-center gap-1">
               <Title
                 level={3}
                 className="m-0 min-w-0 truncate font-semibold tracking-tight text-[var(--content)]"
@@ -214,6 +214,12 @@ export const Sidebar = ({
               >
                 {t("sidebar.brand")}
               </Title>
+              <span
+                data-testid="sidebar-version"
+                className="shrink-0 rounded-full bg-[var(--brand-soft)] px-2 py-0.5 text-[10px] font-semibold leading-none text-[var(--brand-strong)]"
+              >
+                {t("sidebar.version")}
+              </span>
             </div>
           </>
         )}

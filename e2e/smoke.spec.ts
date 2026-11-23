@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 test("loads the app shell with icon-only header actions", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Tasklane/i);
+  await expect(page.getByTestId("sidebar-version")).toHaveText("v1");
   await expect(page.locator("#root")).not.toBeEmpty();
   await expect(page.locator("header")).toBeVisible();
   await expect(page.locator("main header")).toHaveCount(0);
