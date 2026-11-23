@@ -1,6 +1,8 @@
 import {
   AppstoreOutlined,
   DeleteOutlined,
+  EditOutlined,
+  MoreOutlined,
   PlusOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
@@ -9,6 +11,7 @@ import {
   DEFAULT_PROJECT_COLOR,
   deleteProject,
   MAX_PROJECTS,
+  updateProject,
 } from "@src/features/tasks/task.repository";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
@@ -16,14 +19,13 @@ import { t } from "@src/i18n/en";
 import {
   App as AntApp,
   Button,
+  Dropdown,
   Form,
   Input,
   Menu,
   type MenuProps,
   Modal,
-  Popconfirm,
   Space,
-  Tooltip,
   Typography,
 } from "antd";
 import { useState } from "react";
@@ -55,30 +57,49 @@ export const Sidebar = ({
   onSelectProject,
   onLoadExample,
 }: SidebarProps) => {
-  const { message } = AntApp.useApp();
-  const [form] = Form.useForm<ProjectFormValues>();
+  const { message, modal } = AntApp.useApp();
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleCreate = async (values: ProjectFormValues) => {
-    if (projects.length >= MAX_PROJECTS) {
+  const openCreateModal = () => {
+    setEditingProject(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (project: Project) => {
+    setEditingProject(project);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (values: ProjectFormValues) => {
+    if (!editingProject && projects.length >= MAX_PROJECTS) {
       message.warning(t("sidebar.limitReached"));
       return;
     }
 
+    const input = {
+      name: values.name.trim(),
+      color: values.color || DEFAULT_PROJECT_COLOR,
+      description: values.description?.trim(),
+    };
+
     setIsSaving(true);
     try {
-      const project = await createProject({
-        name: values.name.trim(),
-        color: values.color || DEFAULT_PROJECT_COLOR,
-        description: values.description?.trim(),
-      });
-      onSelectProject(project.id);
+      if (editingProject) {
+        await updateProject(editingProject.id, input);
+        message.success(t("sidebar.projectUpdated"));
+      } else {
+        const project = await createProject(input);
+        onSelectProject(project.id);
+        message.success(t("sidebar.projectCreated"));
+      }
       setIsModalOpen(false);
-      form.resetFields();
-      message.success(t("sidebar.projectCreated"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : t("sidebar.projectCreateFailed"));
+      const fallback = editingProject
+        ? t("sidebar.projectUpdateFailed")
+        : t("sidebar.projectCreateFailed");
+      message.error(caught instanceof Error ? caught.message : fallback);
     } finally {
       setIsSaving(false);
     }
@@ -93,6 +114,17 @@ export const Sidebar = ({
     }
   };
 
+  const requestDelete = (project: Project) => {
+    modal.confirm({
+      title: t("sidebar.deleteProjectTitle"),
+      content: t("sidebar.deleteProjectDescription"),
+      okText: t("sidebar.delete"),
+      cancelText: t("sidebar.cancel"),
+      okButtonProps: { danger: true },
+      onOk: () => handleDelete(project.id),
+    });
+  };
+
   const items: MenuProps["items"] = projects.map((project) => ({
     key: project.id,
     label: (
@@ -105,25 +137,42 @@ export const Sidebar = ({
           />
           <span className="truncate">{project.name}</span>
         </span>
-        <Popconfirm
-          title={t("sidebar.deleteProjectTitle")}
-          description={t("sidebar.deleteProjectDescription")}
-          okText={t("sidebar.delete")}
-          cancelText={t("sidebar.cancel")}
-          okButtonProps={{ danger: true }}
-          onConfirm={() => void handleDelete(project.id)}
+        <Dropdown
+          trigger={["click"]}
+          menu={{
+            items: [
+              {
+                key: "edit",
+                icon: <EditOutlined />,
+                label: t("sidebar.editProject"),
+                onClick: ({ domEvent }) => {
+                  domEvent.stopPropagation();
+                  openEditModal(project);
+                },
+              },
+              { type: "divider" },
+              {
+                key: "delete",
+                danger: true,
+                icon: <DeleteOutlined />,
+                label: t("sidebar.delete"),
+                onClick: ({ domEvent }) => {
+                  domEvent.stopPropagation();
+                  requestDelete(project);
+                },
+              },
+            ],
+          }}
         >
-          <Tooltip title={t("sidebar.deleteProjectTooltip")}>
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              aria-label={t("sidebar.deleteProjectAria", { name: project.name })}
-              onClick={(event) => event.stopPropagation()}
-            />
-          </Tooltip>
-        </Popconfirm>
+          <Button
+            type="text"
+            size="small"
+            icon={<MoreOutlined />}
+            title={t("sidebar.projectActionsTooltip")}
+            aria-label={t("sidebar.projectActionsAria", { name: project.name })}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </Dropdown>
       </div>
     ),
   }));
@@ -173,7 +222,7 @@ export const Sidebar = ({
             disabled={atLimit}
             title={atLimit ? t("sidebar.limitReached") : undefined}
             aria-label={t("sidebar.newProject")}
-            onClick={() => setIsModalOpen(true)}
+            onClick={openCreateModal}
           >
             {!collapsed && t("sidebar.newProject")}
           </Button>
@@ -192,17 +241,21 @@ export const Sidebar = ({
       </div>
 
       <Modal
-        title={t("sidebar.newProject")}
+        title={editingProject ? t("sidebar.editProject") : t("sidebar.newProject")}
         open={isModalOpen}
         footer={null}
         onCancel={() => setIsModalOpen(false)}
         destroyOnHidden
       >
         <Form
-          form={form}
+          key={editingProject?.id ?? "new"}
           layout="vertical"
-          initialValues={{ color: DEFAULT_PROJECT_COLOR }}
-          onFinish={(values) => void handleCreate(values)}
+          initialValues={{
+            name: editingProject?.name ?? "",
+            color: editingProject?.color ?? DEFAULT_PROJECT_COLOR,
+            description: editingProject?.description ?? "",
+          }}
+          onFinish={(values) => void handleSubmit(values)}
         >
           <Form.Item
             name="name"
@@ -226,7 +279,7 @@ export const Sidebar = ({
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" block loading={isSaving}>
-            {t("sidebar.createProject")}
+            {editingProject ? t("sidebar.saveChanges") : t("sidebar.createProject")}
           </Button>
         </Form>
       </Modal>
