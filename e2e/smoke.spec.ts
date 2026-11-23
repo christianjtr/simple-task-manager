@@ -8,6 +8,8 @@ test("loads the app shell with icon-only header actions", async ({ page }) => {
   await expect(page.locator("main header")).toHaveCount(0);
   await expect(page.locator("header button")).toHaveCount(3);
   await expect(page.getByRole("button", { name: "Data" })).toBeEmpty();
+  await page.getByRole("button", { name: "Data" }).hover();
+  await expect(page.getByRole("tooltip")).toHaveText("Data export/import");
 
   const sidebarToggle = page.getByRole("button", { name: "Toggle sidebar" });
   await expect(sidebarToggle.locator('[data-icon="double-left"]')).toBeVisible();

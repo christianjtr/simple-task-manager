@@ -60,11 +60,12 @@ describe("Header", () => {
     renderHeader();
 
     expect(screen.getByRole("banner")).toHaveClass("bg-[var(--surface)]");
+    expect(screen.getByTestId("header-project-summary")).toHaveClass("items-center");
     expect(
       screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
     ).toEqual(["Help", "Data", "Toggle theme"]);
     expect(screen.queryByText("Data")).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Work" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Work" })).toHaveStyle({ marginBottom: "0px" });
     expect(screen.getByTestId("header-project-separator")).toBeInTheDocument();
     expect(screen.getByText("Project description")).toBeInTheDocument();
   });

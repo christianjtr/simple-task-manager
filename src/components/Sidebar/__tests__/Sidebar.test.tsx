@@ -49,7 +49,11 @@ describe("Sidebar", () => {
   it("shows the project limit and disables creation when full", () => {
     renderSidebar(projects);
 
-    expect(screen.getByRole("heading", { name: "Tasklane" })).toHaveStyle({ fontSize: "28px" });
+    expect(screen.getByRole("heading", { name: "Tasklane" })).toHaveStyle({
+      fontSize: "28px",
+      marginBottom: "0px",
+    });
+    expect(screen.getByTestId("sidebar-brand")).toHaveClass("items-center");
     expect(screen.getByText("50 / 50")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "New project" })).toBeDisabled();
   });

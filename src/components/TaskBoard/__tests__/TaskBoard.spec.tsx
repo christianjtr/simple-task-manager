@@ -64,6 +64,11 @@ describe("TaskBoard", () => {
     expect(screen.getByTestId("task_board_stage_item_DONE")).toBeInTheDocument();
     expect(screen.getAllByText("Drop tasks here")).toHaveLength(3);
     expect(screen.getByTestId("task-count-chip")).toHaveTextContent("0");
+    expect(screen.getByTestId("task-count-chip")).toHaveClass("inline-flex", "items-center");
+    expect(screen.getByTestId("task-count-chip")).toHaveStyle({
+      display: "inline-flex",
+      height: "24px",
+    });
   });
 
   it("groups tasks by status", () => {

@@ -201,12 +201,20 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
     <div className="flex h-full min-h-0 flex-col">
       <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <Title level={4} className="m-0">
+          <Title level={4} className="m-0" style={{ marginBottom: 0 }}>
             {t("board.tasks")}
           </Title>
           <Tag
             data-testid="task-count-chip"
-            className="m-0 rounded-full px-2 tabular-nums"
+            className="m-0 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 leading-none tabular-nums"
+            style={{
+              display: "inline-flex",
+              height: 24,
+              minWidth: 24,
+              alignItems: "center",
+              justifyContent: "center",
+              lineHeight: 1,
+            }}
             aria-label={
               tasks.length === 1
                 ? t("board.countAriaOne")

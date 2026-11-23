@@ -4,7 +4,7 @@ import { importBackupIntoDb } from "@src/features/tasks/task.repository";
 import { useProjects } from "@src/hooks/useProjects";
 import { useTasks } from "@src/hooks/useTasks";
 import { t } from "@src/i18n/en";
-import { App as AntApp, Button, Dropdown, Modal, Typography } from "antd";
+import { App as AntApp, Button, Dropdown, Modal, Tooltip, Typography } from "antd";
 import { type ChangeEvent, useRef, useState } from "react";
 
 const { Paragraph, Text } = Typography;
@@ -51,34 +51,35 @@ export const BackupActions = () => {
 
   return (
     <>
-      <Dropdown
-        trigger={["click"]}
-        menu={{
-          items: [
-            {
-              key: "export",
-              icon: <ExportOutlined />,
-              label: t("backup.exportJson"),
-              onClick: handleExport,
-            },
-            {
-              key: "import",
-              icon: <ImportOutlined />,
-              label: isImporting ? t("backup.importing") : t("backup.importJson"),
-              disabled: isImporting,
-              onClick: () => fileInputRef.current?.click(),
-            },
-          ],
-        }}
-      >
-        <Button
-          type="text"
-          shape="circle"
-          icon={<DatabaseOutlined />}
-          title={t("backup.data")}
-          aria-label={t("backup.data")}
-        />
-      </Dropdown>
+      <Tooltip title={t("backup.tooltip")}>
+        <Dropdown
+          trigger={["click"]}
+          menu={{
+            items: [
+              {
+                key: "export",
+                icon: <ExportOutlined />,
+                label: t("backup.exportJson"),
+                onClick: handleExport,
+              },
+              {
+                key: "import",
+                icon: <ImportOutlined />,
+                label: isImporting ? t("backup.importing") : t("backup.importJson"),
+                disabled: isImporting,
+                onClick: () => fileInputRef.current?.click(),
+              },
+            ],
+          }}
+        >
+          <Button
+            type="text"
+            shape="circle"
+            icon={<DatabaseOutlined />}
+            aria-label={t("backup.data")}
+          />
+        </Dropdown>
+      </Tooltip>
 
       <input
         ref={fileInputRef}

@@ -47,7 +47,7 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
         collapsedWidth={80}
         trigger={null}
         width={260}
-        className="!h-full !bg-white dark:!bg-slate-900"
+        className="!h-full !min-h-0 !bg-white dark:!bg-slate-900"
       >
         <Sidebar
           projects={projects}

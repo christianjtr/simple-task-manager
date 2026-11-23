@@ -164,6 +164,7 @@ export const en = {
   },
   backup: {
     data: "Data",
+    tooltip: "Data export/import",
     exportJson: "Export JSON",
     importJson: "Import JSON",
     importing: "Importing...",
@@ -184,7 +185,8 @@ export const en = {
     task1Description: "Write down the project goals.",
     task1Tag: "planning",
     task2Title: "Design the board",
-    task2Description: "Sketch the columns and card design.",
+    task2Description:
+      "Sketch the columns and card design, including how task priority, due dates, tags, and the new three-dot actions menu should appear on each card at desktop and mobile widths.",
     task2Tag: "design",
     task3Title: "Set up the environment",
     task3Description: "Install dependencies and configure the repository.",

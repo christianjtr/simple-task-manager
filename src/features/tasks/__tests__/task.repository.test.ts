@@ -1,5 +1,6 @@
 import { db } from "@src/db/database";
 import { loadExampleData } from "@src/db/seed";
+import { t } from "@src/i18n/en";
 import { exportBackup } from "../task.import-export";
 import {
   createProject,
@@ -90,8 +91,14 @@ describe("task repository", () => {
   it("loads optional example data", async () => {
     await loadExampleData();
 
+    const seededTasks = await listTasks();
+
     expect(await listProjects()).toHaveLength(1);
-    expect(await listTasks()).toHaveLength(3);
+    expect(seededTasks).toHaveLength(3);
+    expect(seededTasks.find((task) => task.title === t("seed.task2Title"))?.description).toBe(
+      t("seed.task2Description"),
+    );
+    expect(t("seed.task2Description").length).toBeGreaterThan(140);
   });
 
   it("imports a versioned backup into IndexedDB", async () => {

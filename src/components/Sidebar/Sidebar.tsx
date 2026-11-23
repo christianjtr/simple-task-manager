@@ -185,7 +185,7 @@ export const Sidebar = ({
   const atLimit = projects.length >= MAX_PROJECTS;
 
   return (
-    <aside className="flex h-full flex-col bg-white dark:bg-slate-900">
+    <aside className="flex h-full min-h-0 flex-col bg-white dark:bg-slate-900">
       <div
         className={`flex h-16 items-center gap-2 border-b border-[var(--border)] ${
           collapsed ? "justify-center px-2" : "px-3"
@@ -206,13 +206,15 @@ export const Sidebar = ({
             <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--brand)] text-white">
               <AppstoreOutlined />
             </span>
-            <Title
-              level={3}
-              className="m-0 min-w-0 flex-1 truncate font-semibold leading-none tracking-tight text-[var(--content)]"
-              style={{ fontSize: 28 }}
-            >
-              {t("sidebar.brand")}
-            </Title>
+            <div data-testid="sidebar-brand" className="flex min-w-0 flex-1 items-center">
+              <Title
+                level={3}
+                className="m-0 min-w-0 truncate font-semibold tracking-tight text-[var(--content)]"
+                style={{ fontSize: 28, lineHeight: 1, marginBottom: 0 }}
+              >
+                {t("sidebar.brand")}
+              </Title>
+            </div>
           </>
         )}
       </div>

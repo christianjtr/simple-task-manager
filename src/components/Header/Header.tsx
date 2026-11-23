@@ -19,8 +19,12 @@ export const Header = ({ activeProject, theme, onToggleTheme }: HeaderProps) => 
     className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-4 text-[var(--content)] md:px-6"
     style={{ backgroundColor: "var(--surface)", color: "var(--content)" }}
   >
-    <div className="flex min-w-0 flex-1 items-baseline gap-2">
-      <Title level={4} className="m-0 shrink-0 truncate text-[var(--content)]">
+    <div data-testid="header-project-summary" className="flex min-w-0 flex-1 items-center gap-2">
+      <Title
+        level={4}
+        className="m-0 shrink-0 truncate text-[var(--content)]"
+        style={{ lineHeight: 1, marginBottom: 0 }}
+      >
         {activeProject?.name ?? t("header.noProject")}
       </Title>
       <span className="hidden min-w-0 items-center gap-2 sm:flex">
@@ -29,7 +33,7 @@ export const Header = ({ activeProject, theme, onToggleTheme }: HeaderProps) => 
           data-testid="header-project-separator"
           className="h-4 w-px shrink-0 bg-[var(--border)]"
         />
-        <Text type="secondary" className="min-w-0 truncate text-xs">
+        <Text type="secondary" className="min-w-0 truncate text-xs" style={{ lineHeight: 1 }}>
           {activeProject?.description || t("header.createProjectPrompt")}
         </Text>
       </span>
