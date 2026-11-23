@@ -137,20 +137,25 @@ The repository was later modernized from the original mock real-time challenge i
 - Keep a responsive dark/light shell with persistent preferences.
 - Improve tooling with pnpm, Biome, Vitest, Playwright, and Tailwind CSS v4.
 - Add documentation and a GitHub Pages workflow for the `demo` branch.
+- Localize the product as Tasklane with English UI, seed data, and documentation.
+- Use a full-height responsive shell with an internally scrolling task board.
+- Unify light/dark theming through semantic CSS and Ant Design tokens.
+- Add an in-app Help drawer covering storage limits and the JSON backup contract.
+- Enforce a 50-project cap in both creation and import paths with visible sidebar feedback.
 
 ### Requirement mapping
 
-| Original requirement            | Modernized outcome                                                                  |
-| ------------------------------- | ----------------------------------------------------------------------------------- |
-| Three-column board              | `TaskBoard` keeps To Do, In Progress, and Done mounted as droppable stages.         |
-| 50-100 mock tasks               | Optional example data is seeded into IndexedDB; the app starts with an empty state. |
-| Mock realtime WebSocket         | Removed. `useLiveQuery` reacts to local Dexie writes.                               |
-| Redux state                     | Removed. Hooks and the task repository own reads and mutations.                     |
-| Native drag-and-drop            | Replaced by dnd-kit with `DragOverlay` and keyboard announcements.                  |
-| `OptimizedImage`                | Removed; cards focus on title, description, priority, due date, and tags.           |
-| API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI.     |
-| Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test.            |
-| Type-checked production build   | `pnpm build` runs `tsc -b` before Vite.                                             |
+| Original requirement            | Modernized outcome                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Three-column board              | `TaskBoard` keeps To Do, In Progress, and Done mounted as droppable stages.                                                          |
+| 50-100 mock tasks               | Optional example data is seeded into IndexedDB; the app starts with an empty state. A workspace is separately capped at 50 projects. |
+| Mock realtime WebSocket         | Removed. `useLiveQuery` reacts to local Dexie writes.                                                                                |
+| Redux state                     | Removed. Hooks and the task repository own reads and mutations.                                                                      |
+| Native drag-and-drop            | Replaced by dnd-kit with `DragOverlay` and keyboard announcements.                                                                   |
+| `OptimizedImage`                | Removed; cards focus on title, description, priority, due date, and tags.                                                            |
+| API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI.                                                      |
+| Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test.                                                             |
+| Type-checked production build   | `pnpm build` runs `tsc -b` before Vite.                                                                                              |
 
 ### Review stages
 
@@ -164,3 +169,12 @@ Each stage was implemented in a dedicated branch and merged into `main`:
 6. `modernization/06-dnd-order` — drag-and-drop and persisted ordering.
 7. `modernization/07-portability` — JSON export/import UI.
 8. `modernization/08-docs-demo-workflow` — documentation and demo deployment.
+
+Refinement stages:
+
+9. `refinement/09-english-identity-header` — English UI, Tasklane title, and header cleanup.
+10. `refinement/10-full-height-counters` — full-height shell, responsive board scroll, and column counters.
+11. `refinement/11-theme-tokens` — semantic light/dark tokens.
+12. `refinement/12-help-backup-contract` — Help drawer and IndexedDB/JSON documentation.
+13. `refinement/13-project-limit` — 50-project cap, sidebar counter, and disabled creation.
+14. `refinement/14-docs-final-qa` — final documentation and verification gate.

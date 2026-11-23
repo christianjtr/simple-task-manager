@@ -1,6 +1,6 @@
-# Simple Task Manager
+# Tasklane
 
-A local-first Kanban task manager built with React, TypeScript, Vite, Ant Design, Tailwind CSS, and Dexie. Projects and tasks live in the browser (IndexedDB), so the app works without a backend, authentication, or a WebSocket connection.
+Tasklane is a local-first Kanban task manager built with React, TypeScript, Vite, Ant Design, Tailwind CSS, and Dexie. Projects and tasks live in the browser (IndexedDB), so the app works without a backend, authentication, or a WebSocket connection. The repository and Dexie database keep their original `simple-task-manager` identifiers for data compatibility.
 
 ## Contents
 
@@ -20,8 +20,9 @@ A local-first Kanban task manager built with React, TypeScript, Vite, Ant Design
 - Create, edit, delete, filter, and search tasks by text, priority, and tag.
 - Move and reorder tasks across **To Do**, **In Progress**, and **Done** with the mouse or keyboard.
 - Persist all changes in IndexedDB using Dexie and `useLiveQuery`.
-- Export and import all data through a versioned JSON backup.
-- Keep the UI responsive, themeable (light/dark), and accessible.
+- Export and import all data through a versioned JSON backup, with a hard limit of 50 projects.
+- Keep the UI responsive, themeable (light/dark), accessible, and fully English.
+- Explain storage limits and the JSON backup contract from the in-app Help drawer.
 - Replace the original mock API/WebSocket/Redux implementation with a smaller local-first architecture.
 
 ## Tech stack
@@ -80,12 +81,16 @@ Key pieces:
 - `src/db/database.ts`: Dexie database definition (version 1).
 - `src/db/migrations.ts`: schema upgrades.
 - `src/db/seed.ts`: optional example project and tasks.
-- `src/features/tasks/task.repository.ts`: all persisted mutations, including backup import.
+- `src/features/tasks/task.repository.ts`: all persisted mutations, including the 50-project cap and backup import.
 - `src/features/tasks/task.import-export.ts`: versioned backup export and parse/validate import.
 - `src/features/tasks/task.schema.ts`: Zod schemas for domain and JSON shapes.
+- `src/i18n/en.ts`: single English dictionary and typed translation helper.
+- `src/styles/tailwind.css` / `src/styles/themes/default.ts`: semantic light/dark theme tokens.
 - `src/hooks/useProjects.ts` / `src/hooks/useTasks.ts`: reactive reads from IndexedDB.
 - `src/hooks/useActiveProject.ts` / `src/hooks/useTheme.ts`: persisted UI preferences.
-- `src/components/Header/Header.tsx`: project title, theme toggle, and data menu.
+- `src/components/Header/Header.tsx`: project title, theme toggle, Help button, and Data menu.
+- `src/components/HelpDrawer/HelpDrawer.tsx`: storage limits, JSON contract, and import behavior.
+- `src/components/Sidebar/Sidebar.tsx`: project navigation, `N / 50` counter, and creation limit UI.
 - `src/components/BackupActions/BackupActions.tsx`: JSON export/import UI.
 - `src/components/TaskBoard/TaskBoard.tsx`: filters, CRUD actions, and dnd-kit context.
 - `src/components/TaskBoard/components/TaskBoardStage/TaskBoardStage.tsx`: droppable columns.
@@ -102,29 +107,30 @@ Project { id, name, description?, createdAt, updatedAt }
 Task { id, projectId, title, description?, status, priority, tags[], dueDate?, position, createdAt, updatedAt }
 ```
 
-Use the **Datos** menu in the header to:
+Use the **Data** menu in the header to:
 
-- **Exportar JSON**: download `{ version: 1, exportedAt, projects, tasks }`.
-- **Importar JSON**: select a backup, validate it, persist it in a Dexie transaction, and review imported/skipped counts.
+- **Export JSON**: download `{ version: 1, exportedAt, projects, tasks }`.
+- **Import JSON**: select a backup, validate it, persist it in a Dexie transaction, and review imported/skipped counts.
 
-Import uses `bulkPut`, so an incoming ID replaces an existing local record with the same ID. Duplicate IDs inside a single backup are skipped with a console warning.
+Import uses `bulkPut`, so an incoming ID replaces an existing local record with the same ID. Duplicate IDs inside a single backup are skipped with a console warning. Both creation and import are rejected if the result would exceed 50 projects; no partial write is performed. The Help drawer documents this contract and the IndexedDB limitations in the app itself.
 
 ## Testing
 
-The suite currently contains 29 tests across 9 files.
+The suite currently contains 36 tests across 12 files.
 
 ```shell
 pnpm check
 pnpm build
 pnpm test
 pnpm test:e2e
+DEMO_BASE=true pnpm build
 ```
 
 Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/setupTests.ts`. Playwright smoke tests live in `e2e/` and are excluded from Vitest.
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in six more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -135,23 +141,37 @@ The original implementation was a mock real-time Kanban demo backed by Redux and
 | 5     | `modernization/05-task-crud-filters`     | `2446b74` | Task CRUD and filters                                  |
 | 6     | `modernization/06-dnd-order`             | `66be955` | dnd-kit columns, keyboard movement, persisted order    |
 | 7     | `modernization/07-portability`           | `26be327` | JSON export/import UI and repository import            |
-| 8     | `modernization/08-docs-demo-workflow`    | pending   | Documentation and GitHub Pages demo workflow           |
+| 8     | `modernization/08-docs-demo-workflow`    | `65c0737` | Documentation and GitHub Pages demo workflow           |
+
+Refinements continued in dedicated branches:
+
+| Stage | Branch                                  | Commit    | Outcome                                                   |
+| ----- | --------------------------------------- | --------- | --------------------------------------------------------- |
+| 9     | `refinement/09-english-identity-header` | `dd8bcef` | English UI/seed, Tasklane identity, header avatar removed |
+| 10    | `refinement/10-full-height-counters`    | `147696a` | Full-height layout, mobile board scroll, column counters  |
+| 11    | `refinement/11-theme-tokens`            | `5b3af91` | Semantic light/dark tokens across CSS and Ant Design      |
+| 12    | `refinement/12-help-backup-contract`    | `2806d3d` | Help drawer with storage and JSON backup documentation    |
+| 13    | `refinement/13-project-limit`           | `ce0e195` | 50-project cap, sidebar counter, disabled creation        |
+| 14    | `refinement/14-docs-final-qa`           | current   | Final documentation and verification gate                 |
 
 Notable decisions:
 
 - No backend, auth, Redux, TanStack Query, or simulated WebSocket.
 - Ant Design provides components/theming; Tailwind provides layout utilities; SASS remains for a few component styles.
 - Drag-and-drop uses dnd-kit with `useDroppable` columns and `useSortable` cards.
-- Ant Design Modal uses `destroyOnHidden` (not the older `destroyOnClose`).
+- Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
+- The sidebar collapse state is intentionally session-only; it is not persisted.
 - GitHub Pages builds use `DEMO_BASE=true` to set the Vite base path to `/simple-task-manager/`.
 
 ## Demo deployment
 
 `.github/workflows/deploy-demo.yml` deploys the `demo` branch to GitHub Pages using the official Pages actions.
 
-To publish a demo:
+`main` is the source of truth; `demo` mirrors it for publishing. To publish a demo:
 
 ```shell
+git switch main
+git push origin main
 git switch demo
 git merge main
 git push origin demo
@@ -168,7 +188,9 @@ The workflow requires these repository settings:
 
 - Data is local to the current browser profile; clearing site data removes it.
 - There is no multi-device sync, collaboration, backend, or authentication.
-- Import replaces records with matching IDs via `bulkPut`.
+- Import replaces records with matching IDs via `bulkPut` and refuses backups that would exceed 50 projects.
+- A workspace supports at most 50 projects; the sidebar shows the current usage and disables creation at the cap.
+- Sidebar collapse state is not persisted across reloads.
 - Task images from the original challenge are no longer used.
 - The production build emits a Vite chunk-size warning because Ant Design is bundled into one chunk. It does not affect correctness.
 - The Dribbble visual reference is guarded by a WAF, so implementation followed the challenge requirements and the existing design language instead.
