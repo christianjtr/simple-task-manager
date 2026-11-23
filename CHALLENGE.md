@@ -198,3 +198,4 @@ Refinement stages:
 26. `refinement/26-sidebar-header-separation` — separated the sidebar panel from the right-side header.
 27. `refinement/27-sidebar-uniform-background` — unified the sidebar menu background and brand font size.
 28. `refinement/28-readme-cleanup-pages-version` — derived version from `package.json`, validated demo PRs, removed obsolete assets, and refreshed documentation.
+29. `refinement/29-mit-license` — added the MIT license, package metadata, and README license reference.

@@ -125,3 +125,7 @@ For the stage-by-stage modernization and refinement history, see [CHALLENGE.md](
 - Sidebar collapse state is session-only and resets on reload.
 - Task image attachments from the original challenge are not implemented.
 - The production build emits a Vite chunk-size warning because Ant Design is bundled into one chunk; it does not affect correctness.
+
+## License
+
+Released under the [MIT License](LICENSE).

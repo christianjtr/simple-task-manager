@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "author": "Christian Torrealba",
+  "license": "MIT",
   "packageManager": "pnpm@12.9.1",
   "engines": {
     "node": ">=20"
