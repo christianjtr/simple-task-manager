@@ -1,0 +1,94 @@
+import { db } from "@src/db/database";
+import { loadExampleData } from "@src/db/seed";
+
+import {
+  createProject,
+  createTask,
+  deleteProject,
+  deleteTask,
+  getTask,
+  listProjects,
+  listTasks,
+  moveTask,
+  reorderTasks,
+  updateProject,
+  updateTask,
+} from "../task.repository";
+import { TaskStatus } from "../task.types";
+
+beforeEach(async () => {
+  await db.delete();
+  await db.open();
+});
+
+afterAll(() => {
+  db.close();
+});
+
+describe("task repository", () => {
+  it("creates projects and cascade-deletes their tasks", async () => {
+    const project = await createProject({ name: "Trabajo", color: "#112233" });
+    const task = await createTask({ projectId: project.id, title: "Informe" });
+
+    expect(await listProjects()).toHaveLength(1);
+    expect((await listTasks(project.id)).map((item) => item.id)).toEqual([task.id]);
+
+    await deleteProject(project.id);
+
+    expect(await listProjects()).toEqual([]);
+    expect(await listTasks()).toEqual([]);
+  });
+
+  it("assigns positions per column and supports moving/reordering", async () => {
+    const project = await createProject({ name: "Personal" });
+    const first = await createTask({ projectId: project.id, title: "A" });
+    const second = await createTask({ projectId: project.id, title: "B" });
+    const done = await createTask({
+      projectId: project.id,
+      title: "C",
+      status: TaskStatus.DONE,
+    });
+
+    expect([first.position, second.position, done.position]).toEqual([0, 1, 0]);
+
+    const moved = await moveTask(first.id, TaskStatus.DONE, 0);
+    expect(moved).toMatchObject({ status: TaskStatus.DONE, position: 0 });
+
+    const doneColumn = (await listTasks(project.id)).filter(
+      (task) => task.status === TaskStatus.DONE,
+    );
+    expect(doneColumn.map((task) => task.id)).toEqual([first.id, done.id]);
+
+    const reordered = await reorderTasks(project.id, TaskStatus.DONE, [done.id, first.id]);
+    expect(reordered.map((task) => task.id)).toEqual([done.id, first.id]);
+
+    await deleteTask(second.id);
+    expect(await getTask(second.id)).toBeUndefined();
+  });
+
+  it("updates records and validates project references", async () => {
+    const project = await createProject({ name: "Hobby" });
+    const task = await createTask({ projectId: project.id, title: "Leer" });
+
+    await expect(createTask({ projectId: "missing", title: "x" })).rejects.toThrow(
+      "Project missing not found",
+    );
+
+    const renamedProject = await updateProject(project.id, { name: "Lectura" });
+    expect(renamedProject.name).toBe("Lectura");
+    expect((await createProject({ name: "Otro" })).color).toBe(renamedProject.color);
+
+    const updatedTask = await updateTask(task.id, { title: "Leer más", priority: "high" });
+    expect(updatedTask).toMatchObject({ title: "Leer más", priority: "high" });
+    await expect(updateTask(task.id, { projectId: "missing" })).rejects.toThrow(
+      "Project missing not found",
+    );
+  });
+
+  it("loads optional example data", async () => {
+    await loadExampleData();
+
+    expect(await listProjects()).toHaveLength(1);
+    expect(await listTasks()).toHaveLength(3);
+  });
+});
