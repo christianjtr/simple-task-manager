@@ -16,7 +16,7 @@ Tasklane is a local-first Kanban task manager built with React, TypeScript, Vite
 
 ## Goals
 
-- Create, rename, and delete projects; keep the active project in local storage.
+- Create, edit (name, description, color), and delete projects from the sidebar; keep the active project in local storage.
 - Create, edit, delete, filter, and search tasks by text, priority, and tag.
 - Move and reorder tasks across **To Do**, **In Progress**, and **Done** with the mouse or keyboard.
 - Persist all changes in IndexedDB using Dexie and `useLiveQuery`.
@@ -88,9 +88,9 @@ Key pieces:
 - `src/styles/tailwind.css` / `src/styles/themes/default.ts`: semantic light/dark theme tokens.
 - `src/hooks/useProjects.ts` / `src/hooks/useTasks.ts`: reactive reads from IndexedDB.
 - `src/hooks/useActiveProject.ts` / `src/hooks/useTheme.ts`: persisted UI preferences.
-- `src/components/Header/Header.tsx`: project title, theme toggle, Help button, and Data menu.
+- `src/components/Header/Header.tsx`: project title, theme toggle, and the ordered Help/Data/Theme icon actions.
 - `src/components/HelpDrawer/HelpDrawer.tsx`: storage limits, JSON contract, and import behavior.
-- `src/components/Sidebar/Sidebar.tsx`: project navigation, `N / 50` counter, and creation limit UI.
+- `src/components/Sidebar/Sidebar.tsx`: project navigation, `N / 50` counter, 3-point Edit/Delete menu, and creation limit UI.
 - `src/components/BackupActions/BackupActions.tsx`: JSON export/import UI.
 - `src/components/TaskBoard/TaskBoard.tsx`: filters, CRUD actions, and dnd-kit context.
 - `src/components/TaskBoard/components/TaskBoardStage/TaskBoardStage.tsx`: droppable columns.
@@ -116,7 +116,7 @@ Import uses `bulkPut`, so an incoming ID replaces an existing local record with 
 
 ## Testing
 
-The suite currently contains 36 tests across 12 files.
+The suite currently contains 40 tests across 13 files.
 
 ```shell
 pnpm check
@@ -130,7 +130,7 @@ Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/s
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in six more, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in ten more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -152,13 +152,22 @@ Refinements continued in dedicated branches:
 | 11    | `refinement/11-theme-tokens`            | `5b3af91` | Semantic light/dark tokens across CSS and Ant Design      |
 | 12    | `refinement/12-help-backup-contract`    | `2806d3d` | Help drawer with storage and JSON backup documentation    |
 | 13    | `refinement/13-project-limit`           | `ce0e195` | 50-project cap, sidebar counter, disabled creation        |
-| 14    | `refinement/14-docs-final-qa`           | current   | Final documentation and verification gate                 |
+| 14    | `refinement/14-docs-final-qa`           | `19593c4` | Final documentation and verification gate                 |
+
+| Stage | Branch                           | Commit    | Outcome                                                   |
+| ----- | -------------------------------- | --------- | --------------------------------------------------------- |
+| 15    | `refinement/15-project-actions`  | `55e1218` | 3-point project menu, project editing, and delete confirm |
+| 16    | `refinement/16-header-actions`   | `5bf40a4` | Light header surface, ordered icon actions, `Sun` toggle  |
+| 17    | `refinement/17-accent-and-brand` | `f6b64a2` | Shared dark purple palette and token-only accent classes  |
+| 18    | `refinement/18-final-qa-docs`    | current   | Updated documentation and full verification gate          |
 
 Notable decisions:
 
 - No backend, auth, Redux, TanStack Query, or simulated WebSocket.
 - Ant Design provides components/theming; Tailwind provides layout utilities; SASS remains for a few component styles.
 - Drag-and-drop uses dnd-kit with `useDroppable` columns and `useSortable` cards.
+- Project actions live in a 3-point menu; editing reuses the create modal and updates color too.
+- The shared accent palette is `#6366f1` in light mode, `#818cf8` for dark hover/strong text, and `rgba(99,102,241,0.22)` for soft surfaces.
 - Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
 - The sidebar collapse state is intentionally session-only; it is not persisted.
 - GitHub Pages builds use `DEMO_BASE=true` to set the Vite base path to `/simple-task-manager/`.

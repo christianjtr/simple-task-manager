@@ -142,6 +142,9 @@ The repository was later modernized from the original mock real-time challenge i
 - Unify light/dark theming through semantic CSS and Ant Design tokens.
 - Add an in-app Help drawer covering storage limits and the JSON backup contract.
 - Enforce a 50-project cap in both creation and import paths with visible sidebar feedback.
+- Manage projects from a 3-point menu with edit (name, description, color) and confirmed delete.
+- Keep header actions icon-only and consistently grouped around the project title.
+- Share one indigo accent palette across CSS tokens and Ant Design themes in both modes.
 
 ### Requirement mapping
 
@@ -178,3 +181,7 @@ Refinement stages:
 12. `refinement/12-help-backup-contract` — Help drawer and IndexedDB/JSON documentation.
 13. `refinement/13-project-limit` — 50-project cap, sidebar counter, and disabled creation.
 14. `refinement/14-docs-final-qa` — final documentation and verification gate.
+15. `refinement/15-project-actions` — 3-point project menu and project editing.
+16. `refinement/16-header-actions` — header surface, icon order, and theme icon cleanup.
+17. `refinement/17-accent-and-brand` — shared dark purple accent palette.
+18. `refinement/18-final-qa-docs` — updated documentation and full verification gate.
