@@ -3,11 +3,13 @@ import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ArrowUpOutlined,
+  DeleteOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import type { Task } from "@src/features/tasks/task.types";
-import { toIsoString } from "@src/features/tasks/task.utils";
+import { formatDueDate, toIsoString } from "@src/features/tasks/task.utils";
 import { formatDateForDisplay } from "@src/utils/formatDateForDisplay";
-import { Button, Card, Typography } from "antd";
+import { Button, Card, Popconfirm, Tag, Tooltip, Typography } from "antd";
 import { type DragEventHandler, useMemo } from "react";
 import styles from "./TaskCard.module.scss";
 
@@ -22,16 +24,31 @@ interface TaskCardProps extends Task {
   onDragOver?: DragEventHandler<HTMLLIElement>;
   onDrop?: DragEventHandler<HTMLLIElement>;
   onMove?: (direction: TaskMoveDirection) => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (id: string) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   canMovePrevious?: boolean;
   canMoveNext?: boolean;
 }
 
+const priorityColors = {
+  low: "green",
+  medium: "gold",
+  high: "red",
+} as const;
+
 const TaskCard = ({
   id,
+  projectId,
   title,
   description,
+  status,
+  position,
+  priority,
+  tags,
+  dueDate,
+  createdAt,
   updatedAt,
   className,
   onDragStart,
@@ -39,6 +56,8 @@ const TaskCard = ({
   onDragOver,
   onDrop,
   onMove,
+  onEdit,
+  onDelete,
   canMoveUp = false,
   canMoveDown = false,
   canMovePrevious = false,
@@ -48,6 +67,22 @@ const TaskCard = ({
     () => formatDateForDisplay(toIsoString(updatedAt)),
     [updatedAt],
   );
+
+  const handleEdit = () => {
+    onEdit?.({
+      id,
+      projectId,
+      title,
+      description,
+      status,
+      position,
+      priority,
+      tags,
+      dueDate,
+      createdAt,
+      updatedAt,
+    });
+  };
 
   return (
     <li
@@ -61,12 +96,62 @@ const TaskCard = ({
       onDrop={onDrop}
     >
       <Card
-        classNames={{ cover: styles.image }}
         title={title}
-        extra={<Text type="secondary">{updatedAtToDisplay}</Text>}
+        extra={<Tag color={priorityColors[priority]}>{priority}</Tag>}
         className={styles.taskCard}
       >
-        {description}
+        <div className="mb-2 flex flex-wrap items-center gap-1">
+          <Text type="secondary" className="text-xs">
+            Actualizado {updatedAtToDisplay}
+          </Text>
+          {dueDate && (
+            <Text type="secondary" className="text-xs">
+              Vence {formatDueDate(dueDate)}
+            </Text>
+          )}
+          {tags.map((tag) => (
+            <Tag key={tag} bordered={false}>
+              {tag}
+            </Tag>
+          ))}
+        </div>
+        <div className="whitespace-pre-wrap">{description}</div>
+        {(onEdit || onDelete) && (
+          <div className="mt-3 flex items-center gap-1">
+            {onEdit && (
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                aria-label={`Edit ${title}`}
+                onClick={handleEdit}
+              >
+                Editar
+              </Button>
+            )}
+            {onDelete && (
+              <Popconfirm
+                title="¿Eliminar tarea?"
+                okText="Eliminar"
+                cancelText="Cancelar"
+                okButtonProps={{ danger: true }}
+                onConfirm={() => onDelete(id)}
+              >
+                <Tooltip title="Eliminar tarea">
+                  <Button
+                    type="link"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                    aria-label={`Delete ${title}`}
+                  >
+                    Eliminar
+                  </Button>
+                </Tooltip>
+              </Popconfirm>
+            )}
+          </div>
+        )}
       </Card>
       {onMove && (
         <fieldset className={styles.controls}>

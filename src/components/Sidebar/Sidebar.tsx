@@ -183,7 +183,7 @@ export const Sidebar = ({
         open={isModalOpen}
         footer={null}
         onCancel={() => setIsModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}

@@ -11,11 +11,21 @@ interface TaskBoardStageProps {
   status: TaskStatus;
   tasks: Task[];
   onMoveTask?: (taskId: Task["id"], status: TaskStatus, index: number) => Promise<void>;
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (id: string) => void;
 }
 
 const { Title } = Typography;
 
-const TaskBoardStage = ({ id, title, status, tasks, onMoveTask }: TaskBoardStageProps) => {
+const TaskBoardStage = ({
+  id,
+  title,
+  status,
+  tasks,
+  onMoveTask,
+  onEditTask,
+  onDeleteTask,
+}: TaskBoardStageProps) => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const stagePosition = STAGE_ORDER.indexOf(status);
@@ -87,6 +97,8 @@ const TaskBoardStage = ({ id, title, status, tasks, onMoveTask }: TaskBoardStage
               setDropIndex(null);
             }}
             onMove={(direction) => handleMove(task.id, direction)}
+            onEdit={onEditTask}
+            onDelete={onDeleteTask}
             canMoveUp={index > 0}
             canMoveDown={index < tasks.length - 1}
             canMovePrevious={stagePosition > 0}
