@@ -1,83 +1,65 @@
-import React, { useMemo } from "react";
-import { Col, Row } from "antd";
-import toastr from "toastr";
+import { useMemo } from "react";
+import { Alert, App as AntApp, Button, Col, Row, Spin } from "antd";
 
-import { TaskStatus, type Task } from "@src/types/task";
-import type { TaskBoardStageProps } from "./components/TaskBoardStage/TaskBoardStage";
+import { useTaskService } from "@src/hooks/useTaskService";
+import type { TaskStatus } from "@src/types/task";
+import { DEFAULT_STAGES } from "./stages";
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
-import { useAppSelector } from "../../hooks/useReduxStore";
 
-interface TaskBoardProps {
-    onTransitionTask: (taskId: Task['id'], task: Partial<Task>) => Promise<void>;
-}
+const TaskBoard = () => {
+  const { message } = AntApp.useApp();
+  const { tasks, isLoading, error, reload, moveTask } = useTaskService();
 
-const DEFAULT_STAGES: TaskBoardStageProps[] = [
-    {
-        id: TaskStatus.TODO,
-        title: "To Do",
-        status: TaskStatus.TODO,
-        tasks: [],
-    },
-    {
-        id: TaskStatus.IN_PROGRESS,
-        title: "In Progress",
-        status: TaskStatus.IN_PROGRESS,
-        tasks: [],
-    },
-    {
-        id: TaskStatus.DONE,
-        title: "Done",
-        status: TaskStatus.DONE,
-        tasks: [],
+  const stages = useMemo(
+    () =>
+      DEFAULT_STAGES.map((stage) => ({
+        ...stage,
+        tasks: tasks.filter((task) => task.status === stage.status),
+      })),
+    [tasks]
+  );
+
+  const handleMove = async (
+    taskId: string,
+    status: TaskStatus,
+    index: number
+  ): Promise<void> => {
+    try {
+      await moveTask(taskId, status, index);
+      message.success(`Task ${taskId} moved to ${status}`);
+    } catch (caught) {
+      message.error(
+        `Cannot move task ${taskId}: ${
+          caught instanceof Error ? caught.message : String(caught)
+        }`
+      );
     }
-];
+  };
 
-const TaskBoard: React.FC<TaskBoardProps> = (props): React.JSX.Element | null => {
-    const { onTransitionTask: transitionTask } = props;
-
-    const tasks: Task[] = useAppSelector((state) => state.tasks.tasks);
-
-    const stagesWithTasks = useMemo(() => {
-        const data = DEFAULT_STAGES.map((eachStage) => ({
-            ...eachStage,
-            tasks: tasks
-                .map((eachTask) => ({
-                    ...eachTask,
-                    selected: false,
-                    chosen: false,
-                    filtered: false,
-                }))
-                .filter((eachTask) => eachTask.status === eachStage.status)
-        }));
-
-        return data;
-    }, [tasks]);
-
-    const handleOnTransitionTask = async (taskId: Task['id'], status: TaskStatus): Promise<void> => {
-        try {
-            await transitionTask(taskId, { status });
-            toastr.success(`Task: ${taskId}, moved to ${status}`, 'Success');
-        } catch (error) {
-            toastr.error(`Cannot transition task: ${taskId}, Issue: ${error}`, 'Ups!');
-            throw (error);
-        }
-    }
-
-    if (stagesWithTasks.length === 0) {
-        return null;
-    }
-
-    return (
-        <React.Fragment>
-            <Row gutter={[24, 24]}>
-                {stagesWithTasks.map((eachStage, index) => (
-                    <Col key={`task_board_stage_item_${index}`} span={24 / DEFAULT_STAGES.length}>
-                        <TaskBoardStage {...eachStage} onTransitionTask={handleOnTransitionTask} />
-                    </Col>
-                ))}
-            </Row>
-        </React.Fragment>
-    );
-}
+  return (
+    <Spin spinning={isLoading && tasks.length === 0} tip="Loading tasks…">
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="Could not load tasks"
+          description={error}
+          action={
+            <Button size="small" onClick={() => void reload().catch(() => {})}>
+              Retry
+            </Button>
+          }
+        />
+      )}
+      <Row gutter={[24, 24]}>
+        {stages.map((stage) => (
+          <Col key={stage.id} span={24 / stages.length}>
+            <TaskBoardStage {...stage} onMoveTask={handleMove} />
+          </Col>
+        ))}
+      </Row>
+    </Spin>
+  );
+};
 
 export { TaskBoard };

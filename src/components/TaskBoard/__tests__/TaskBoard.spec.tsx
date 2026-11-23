@@ -1,151 +1,152 @@
-import { render, screen } from "@testing-library/react";
-import { Provider } from "react-redux";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
-import toastr from "toastr";
+import { Provider } from "react-redux";
+import { App as AntApp } from "antd";
 
-import taskSlice, { TaskState } from "../../../store/taskSlice";
-import { useAppSelector } from "../../../hooks/useReduxStore";
-import { Task, TaskStatus } from "../../../types/task";
-import { TaskBoardStage } from "../components/TaskBoardStage/TaskBoardStage";
-
+import taskSlice from "../../../store/taskSlice";
+import { useTaskService } from "../../../hooks/useTaskService";
+import { TaskStatus, type Task } from "../../../types/task";
 import { TaskBoard } from "../TaskBoard";
 
-function setupStore(preloadedState: { tasks: TaskState }) {
-    return configureStore({
-        reducer: {
-            tasks: taskSlice,
-        },
-        preloadedState,
-    });
-}
-
-jest.mock("toastr", () => ({
-    success: jest.fn(),
-    error: jest.fn(),
+jest.mock("../../../hooks/useTaskService", () => ({
+  useTaskService: jest.fn(),
 }));
 
-jest.mock("antd", () => ({
-    Col: ({ children, ...rest }: { children: React.ReactNode }) => <div data-testid="col" {...rest}>{children}</div>,
-    Row: ({ children, ...rest }: { children: React.ReactNode }) => <div data-testid="row" {...rest}>{children}</div>,
-}));
+const mockUseTaskService = useTaskService as jest.MockedFunction<
+  typeof useTaskService
+>;
+const messageMock = { success: jest.fn(), error: jest.fn() };
 
-jest.mock("../../../hooks/useReduxStore", () => ({
-    useAppSelector: jest.fn(),
-}));
+const task = (id: string, status: TaskStatus): Task => ({
+  id,
+  title: `Task ${id}`,
+  description: "description",
+  status,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+});
 
-jest.mock("../components/TaskBoardStage/TaskBoardStage", () => ({
-    TaskBoardStage: jest.fn((props) => {
-        if (props.tasks && props.tasks.length > 0) {
-            return <div data-testid="task-board-stage">TaskBoardStage</div>;
-        }
-        return null;
-    }),
-}));
+const reload = jest.fn();
+const moveTask = jest.fn();
 
-describe("TaskBoard component", () => {
-    const mockTasks = [
-        { id: "1", title: "Task 1", status: TaskStatus.TODO },
-        { id: "2", title: "Task 2", status: TaskStatus.IN_PROGRESS },
-        { id: "3", title: "Task 3", status: TaskStatus.DONE },
-    ];
+const renderBoard = () => {
+  const store = configureStore({ reducer: { tasks: taskSlice } });
+  return render(
+    <Provider store={store}>
+      <TaskBoard />
+    </Provider>
+  );
+};
 
-    const mockTransitionTask = jest.fn(() => Promise.resolve());
-
-    beforeEach(() => {
-        jest.clearAllMocks();
+describe("TaskBoard", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    reload.mockResolvedValue(undefined);
+    jest.spyOn(AntApp, "useApp").mockReturnValue({
+      message: messageMock,
+    } as never);
+    mockUseTaskService.mockReturnValue({
+      tasks: [],
+      isLoading: false,
+      error: null,
+      connectionStatus: "connected",
+      reload,
+      moveTask,
+      createTask: jest.fn(),
+      updateTaskById: jest.fn(),
+      deleteTask: jest.fn(),
     });
+  });
 
-    it("should render TaskBoard stages with tasks", () => {
-        const store = setupStore({ tasks: { tasks: mockTasks as Task[], isLoading: false, error: null } });
-        (useAppSelector as jest.Mock) = jest.fn().mockReturnValue(mockTasks);
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-        render(
-            <Provider store={store}>
-                <TaskBoard onTransitionTask={mockTransitionTask} />
-            </Provider>
-        );
+  it("always renders the three columns", () => {
+    renderBoard();
 
-        expect(TaskBoardStage).toHaveBeenCalledTimes(3);
+    expect(
+      screen.getByTestId("task_board_stage_item_TODO")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("task_board_stage_item_IN_PROGRESS")
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("task_board_stage_item_DONE")).toBeInTheDocument();
+    expect(screen.getAllByText("Drop tasks here")).toHaveLength(3);
+  });
 
-        const expectedStages = [
-            {
-                title: "To Do",
-                status: TaskStatus.TODO,
-                tasks: [{ id: "1", title: "Task 1", status: TaskStatus.TODO, selected: false, chosen: false, filtered: false }],
-            },
-            {
-                title: "In Progress",
-                status: TaskStatus.IN_PROGRESS,
-                tasks: [{ id: "2", title: "Task 2", status: TaskStatus.IN_PROGRESS, selected: false, chosen: false, filtered: false }],
-            },
-            {
-                title: "Done",
-                status: TaskStatus.DONE,
-                tasks: [{ id: "3", title: "Task 3", status: TaskStatus.DONE, selected: false, chosen: false, filtered: false }],
-            },
-        ];
-
-        expectedStages.forEach((expectedStage) => {
-            expect(TaskBoardStage).toHaveBeenCalledWith(
-                expect.objectContaining(expectedStage),
-                expect.anything()
-            );
-        });
+  it("groups tasks by status", () => {
+    mockUseTaskService.mockReturnValue({
+      ...mockUseTaskService(),
+      tasks: [
+        task("1", TaskStatus.TODO),
+        task("2", TaskStatus.IN_PROGRESS),
+        task("3", TaskStatus.DONE),
+      ],
     });
+    renderBoard();
 
-    it("should call onTransitionTask and shows success toastr on successful transition", async () => {
-        const store = setupStore({ tasks: { tasks: mockTasks as Task[], isLoading: false, error: null } });
-        (useAppSelector as jest.Mock) = jest.fn().mockReturnValue(mockTasks);
+    expect(
+      within(screen.getByTestId("task_board_stage_item_TODO")).getByTestId(
+        "task_card_item_1"
+      )
+    ).toBeInTheDocument();
+    expect(
+      within(
+        screen.getByTestId("task_board_stage_item_IN_PROGRESS")
+      ).getByTestId("task_card_item_2")
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId("task_board_stage_item_DONE")).getByTestId(
+        "task_card_item_3"
+      )
+    ).toBeInTheDocument();
+  });
 
-        render(
-            <Provider store={store}>
-                <TaskBoard onTransitionTask={mockTransitionTask} />
-            </Provider>
-        );
-
-        const mockHandleTransition = (TaskBoardStage as jest.Mock).mock.calls[0][0].onTransitionTask;
-
-        await mockHandleTransition("1", TaskStatus.IN_PROGRESS);
-
-        expect(mockTransitionTask).toHaveBeenCalledWith("1", { status: TaskStatus.IN_PROGRESS });
-        expect(toastr.success).toHaveBeenCalledWith(`Task: 1, moved to ${TaskStatus.IN_PROGRESS}`, "Success");
+  it("moves a task with the keyboard control and reports success", async () => {
+    mockUseTaskService.mockReturnValue({
+      ...mockUseTaskService(),
+      tasks: [task("1", TaskStatus.TODO)],
     });
+    moveTask.mockResolvedValueOnce(undefined);
+    renderBoard();
 
-    it("should call onTransitionTask and shows error toastr on failed transition", async () => {
-        const error = new Error("Transition failed");
-        mockTransitionTask.mockRejectedValue(error);
+    fireEvent.click(
+      screen.getByLabelText("Move Task 1 to next column")
+    );
 
-        const store = setupStore({ tasks: { tasks: mockTasks as Task[], isLoading: false, error: null } });
-        (useAppSelector as jest.Mock) = jest.fn().mockReturnValue(mockTasks);
+    await waitFor(() =>
+      expect(moveTask).toHaveBeenCalledWith("1", TaskStatus.IN_PROGRESS, 0)
+    );
+    await waitFor(() =>
+      expect(messageMock.success).toHaveBeenCalledWith(
+        "Task 1 moved to IN_PROGRESS"
+      )
+    );
+  });
 
-        render(
-            <Provider store={store}>
-                <TaskBoard onTransitionTask={mockTransitionTask} />
-            </Provider>
-        );
-
-        const mockHandleTransition = (TaskBoardStage as jest.Mock).mock.calls[0][0].onTransitionTask;
-
-        await expect(mockHandleTransition("1", TaskStatus.IN_PROGRESS)).rejects.toThrow(error);
-
-        expect(mockTransitionTask).toHaveBeenCalledWith("1", { status: TaskStatus.IN_PROGRESS });
-        expect(toastr.error).toHaveBeenCalledWith(`Cannot transition task: 1, Issue: ${error}`, "Ups!");
+  it("reports a failed move without crashing", async () => {
+    mockUseTaskService.mockReturnValue({
+      ...mockUseTaskService(),
+      tasks: [task("1", TaskStatus.TODO)],
     });
+    moveTask.mockRejectedValueOnce(new Error("network down"));
+    renderBoard();
 
-    it("should render empty stages if no data is provided", () => {
-        const store = setupStore({ tasks: { tasks: [], isLoading: false, error: null } });
-        (useAppSelector as jest.Mock) = jest.fn().mockReturnValue([]);
+    fireEvent.click(screen.getByLabelText("Move Task 1 to next column"));
+    await waitFor(() => expect(messageMock.error).toHaveBeenCalled());
+    expect(messageMock.error.mock.calls[0][0]).toContain("network down");
+  });
 
-        render(
-            <Provider store={store}>
-                <TaskBoard onTransitionTask={mockTransitionTask} />
-            </Provider>
-        );
-
-        const colElements = screen.getAllByTestId("col");
-
-        colElements.forEach((colElement) => {
-            expect(colElement.textContent).toBe("");
-        });
+  it("shows load errors and allows retrying", () => {
+    mockUseTaskService.mockReturnValue({
+      ...mockUseTaskService(),
+      error: "API unavailable",
     });
+    renderBoard();
+
+    expect(screen.getByText("API unavailable")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
 });

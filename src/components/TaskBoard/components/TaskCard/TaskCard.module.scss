@@ -1,32 +1,52 @@
 @use "sass:color";
 @use "@styles/tokens" as *;
 
+.cardWrapper {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 .taskCard {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
-    cursor: pointer;
+  &:hover {
+    background-color: $background-color-hover-standard;
+  }
 
-    &:hover {
-        background-color: $background-color-hover-standard;
-    }
-
-    &:active {
-        background-color: color.adjust(
-            $interaction-color-action,
-            $lightness: 50%
-        );
-    }
+  &:active {
+    background-color: color.adjust(
+      $interaction-color-action,
+      $lightness: 50%
+    );
+  }
 }
 
 .taskCard .image {
-    width: 100%;
+  width: 100%;
 
-    * {
-        width: inherit !important;
-    }
+  * {
+    width: inherit !important;
+  }
+}
+
+.controls {
+  display: flex;
+  gap: $spacing-xs;
+  justify-content: flex-end;
+  margin-top: $spacing-xs;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+
+  .cardWrapper:hover &,
+  .cardWrapper:focus-within & {
+    opacity: 1;
+  }
 }

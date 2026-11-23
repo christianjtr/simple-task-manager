@@ -1,65 +1,112 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Divider } from "antd";
-import { ReactSortable, SortableEvent } from "react-sortablejs";
+import { useState, type DragEvent } from "react";
+import { Empty, Typography } from "antd";
 
-import { TaskStatus, Task } from "@src/types/task";
-import { TaskCard } from "../TaskCard/TaskCard";
+import { TaskStatus, type Task } from "@src/types/task";
+import { STAGE_ORDER } from "../../stages";
+import { TaskCard, type TaskMoveDirection } from "../TaskCard/TaskCard";
 import styles from "./TaskBoardStage.module.scss";
 
-export interface DraggableItem extends Task {
-    selected?: boolean;
-    chosen?: boolean;
-    filtered?: boolean;
-}
-export interface TaskBoardStageProps {
-    id: TaskStatus;
-    title: string;
-    status: TaskStatus;
-    tasks: DraggableItem[];
-    onTransitionTask?: (taskId: Task['id'], status: TaskStatus) => Promise<void>;
+interface TaskBoardStageProps {
+  id: TaskStatus;
+  title: string;
+  status: TaskStatus;
+  tasks: Task[];
+  onMoveTask?: (taskId: Task["id"], status: TaskStatus, index: number) => Promise<void>;
 }
 
 const { Title } = Typography;
 
-const TaskBoardStage: React.FC<TaskBoardStageProps> = (props): React.JSX.Element | null => {
-    const { title, status: taskBoardStatus, tasks, id, onTransitionTask: transitionTask } = props;
+const TaskBoardStage = ({
+  id,
+  title,
+  status,
+  tasks,
+  onMoveTask,
+}: TaskBoardStageProps) => {
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const stagePosition = STAGE_ORDER.indexOf(status);
 
-    const [stageTasks, setStageTasks] = useState<DraggableItem[]>([]);
+  const handleDrop = (index: number, event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const taskId = event.dataTransfer.getData("text/plain") || draggedId;
+    setDraggedId(null);
+    setDropIndex(null);
+    if (taskId) void onMoveTask?.(taskId, status, index);
+  };
 
-    const handleOnDraggingEnded = (event: SortableEvent) => {
-        if (event.pullMode) {
-            const taskId = event.item.id;
-            const status = event.to.id;
-            transitionTask?.(taskId, status as TaskStatus);
-        }
+  const handleMove = (taskId: string, direction: TaskMoveDirection) => {
+    const index = tasks.findIndex((task) => task.id === taskId);
+    if (index === -1) return;
+
+    if (direction === "up") {
+      void onMoveTask?.(taskId, status, Math.max(0, index - 1));
+      return;
+    }
+    if (direction === "down") {
+      void onMoveTask?.(taskId, status, Math.min(tasks.length - 1, index + 1));
+      return;
     }
 
-    useEffect(() => {
-        setStageTasks(tasks);
-    }, [tasks]);
+    const nextPosition =
+      stagePosition + (direction === "next" ? 1 : -1);
+    const nextStatus = STAGE_ORDER[nextPosition];
+    if (nextStatus) void onMoveTask?.(taskId, nextStatus, 0);
+  };
 
-    if (stageTasks.length === 0) {
-        return null;
-    }
-
-    return (
-        <div className={styles.taskBoardStage} data-testid={`task_board_stage_item_${id}`}>
-            <Title level={4} className={styles.title}>{title}</Title>
-            <Divider />
-            <ReactSortable
-                id={id}
-                list={stageTasks}
-                setList={setStageTasks}
-                group="taskboard"
-                className={styles.list}
-                onEnd={handleOnDraggingEnded}
-            >
-                {stageTasks.map((item, index) => (
-                    <TaskCard key={`task_card_status_${taskBoardStatus.toLowerCase()}_item_${index}`} {...item} />
-                ))}
-            </ReactSortable>
-        </div>
-    );
-}
+  return (
+    <section
+      className={styles.taskBoardStage}
+      data-testid={`task_board_stage_item_${id}`}
+      aria-label={`${title} column`}
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={(event) => handleDrop(tasks.length, event)}
+    >
+      <Title level={4} className={styles.title}>
+        {title}
+      </Title>
+      <div className={styles.count} aria-label={`${tasks.length} tasks`}>
+        {tasks.length}
+      </div>
+      <div className={styles.list}>
+        {tasks.length === 0 && (
+          <Empty description="Drop tasks here" className={styles.empty} />
+        )}
+        {tasks.map((task, index) => (
+          <div
+            key={task.id}
+            className={`${styles.cardSlot} ${
+              dropIndex === index && draggedId ? styles.dropTarget : ""
+            }`}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDropIndex(index);
+            }}
+            onDrop={(event) => handleDrop(index, event)}
+          >
+            <TaskCard
+              {...task}
+              onDragStart={(event) => {
+                event.dataTransfer.setData("text/plain", task.id);
+                event.dataTransfer.effectAllowed = "move";
+                setDraggedId(task.id);
+              }}
+              onDragEnd={() => {
+                setDraggedId(null);
+                setDropIndex(null);
+              }}
+              onMove={(direction) => handleMove(task.id, direction)}
+              canMoveUp={index > 0}
+              canMoveDown={index < tasks.length - 1}
+              canMovePrevious={stagePosition > 0}
+              canMoveNext={stagePosition < STAGE_ORDER.length - 1}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export { TaskBoardStage };

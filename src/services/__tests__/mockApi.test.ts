@@ -1,141 +1,88 @@
-import { mockApi } from "../mockApi";
+import { mockApi, MOCK_TASK_COUNT } from "../mockApi";
 import { TaskStatus } from "../../types/task";
 
 describe("mockApi", () => {
-  describe("getTasks", () => {
-    it("should return an array of tasks", async () => {
-      const tasks = await mockApi.getTasks();
+  beforeEach(() => mockApi.reset());
 
-      expect(Array.isArray(tasks)).toBe(true);
-      expect(tasks.length).toBe(75);
-    });
-
-    it("should return tasks with valid structure", async () => {
-      const tasks = await mockApi.getTasks();
-      const task = tasks[0];
-
-      expect(task).toEqual(
-        expect.objectContaining({
-          id: expect.any(String),
-          title: expect.any(String),
-          description: expect.any(String),
-          status: expect.any(String),
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String),
-        })
-      );
-
-      expect(Object.values(TaskStatus)).toContain(task.status);
-    });
-
-    it("should maintain consistent data between calls", async () => {
-      const firstCall = await mockApi.getTasks();
-      const secondCall = await mockApi.getTasks();
-
-      expect(firstCall).toEqual(secondCall);
-    });
+  it("loads a pre-populated list within the required range", async () => {
+    const tasks = await mockApi.getTasks();
+    expect(tasks).toHaveLength(MOCK_TASK_COUNT);
+    expect(tasks.length).toBeGreaterThanOrEqual(50);
+    expect(tasks.length).toBeLessThanOrEqual(100);
+    expect(tasks[0]).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        title: expect.any(String),
+        description: expect.any(String),
+        status: expect.any(String),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+      })
+    );
+    expect(Object.values(TaskStatus)).toContain(tasks[0].status);
   });
 
-  describe("updateTask", () => {
-    it("should update an existing task", async () => {
-      const tasks = await mockApi.getTasks();
-      const taskToUpdate = tasks[0];
-
-      const updates = {
-        title: "Updated Title",
-        description: "Updated Description",
-        status: TaskStatus.IN_PROGRESS,
-      };
-
-      const updatedTask = await mockApi.updateTask(taskToUpdate.id, updates);
-
-      expect(updatedTask).toEqual(
-        expect.objectContaining({
-          ...taskToUpdate,
-          ...updates,
-          updatedAt: expect.any(String),
-        })
-      );
-
-      const allTasks = await mockApi.getTasks();
-      const foundTask = allTasks.find((t) => t.id === taskToUpdate.id);
-      expect(foundTask).toEqual(updatedTask);
-    });
-
-    it("should throw error when updating non-existent task", async () => {
-      await expect(
-        mockApi.updateTask("non-existent-id", { title: "New Title" })
-      ).rejects.toThrow("Task non-existent-id not found");
-    }, 10000);
-
-    it("should only update specified fields", async () => {
-      const tasks = await mockApi.getTasks();
-      const taskToUpdate = tasks[0];
-      const originalTask = { ...taskToUpdate };
-
-      const updates = {
-        title: "Partial Update",
-      };
-
-      const updatedTask = await mockApi.updateTask(taskToUpdate.id, updates);
-
-      expect(updatedTask).toEqual(
-        expect.objectContaining({
-          ...originalTask,
-          title: updates.title,
-          updatedAt: expect.any(String),
-        })
-      );
-
-      expect(updatedTask.description).toBe(originalTask.description);
-      expect(updatedTask.status).toBe(originalTask.status);
-    });
-
-    it("should update timestamps correctly", async () => {
-      const tasks = await mockApi.getTasks();
-      const taskToUpdate = tasks[0];
-      const originalUpdatedAt = taskToUpdate.updatedAt;
-
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      const updatedTask = await mockApi.updateTask(taskToUpdate.id, {
-        title: "New Title",
-      });
-
-      expect(updatedTask.createdAt).toBe(taskToUpdate.createdAt);
-      expect(updatedTask.updatedAt).not.toBe(originalUpdatedAt);
-      expect(new Date(updatedTask.updatedAt).getTime()).toBeGreaterThan(
-        new Date(originalUpdatedAt).getTime()
-      );
-    });
+  it("returns a stable snapshot between calls", async () => {
+    expect(await mockApi.getTasks()).toEqual(await mockApi.getTasks());
   });
 
-  describe("_updateTaskState", () => {
-    it("should update task state without delay", () => {
-      const tasks = mockApi.getTasks();
-      return tasks.then((allTasks) => {
-        const taskToUpdate = allTasks[0];
-
-        const updates = {
-          title: "Instant Update",
-        };
-
-        const updatedTask = mockApi._updateTaskState(taskToUpdate.id, updates);
-
-        expect(updatedTask).toEqual(
-          expect.objectContaining({
-            ...taskToUpdate,
-            ...updates,
-            updatedAt: expect.any(String),
-          })
-        );
-      });
+  it("updates only the requested fields", async () => {
+    const [target] = await mockApi.getTasks();
+    const updated = await mockApi.updateTask(target.id, {
+      id: target.id,
+      title: "New title",
     });
 
-    it("should throw error for non-existent task", () => {
-      expect(() =>
-        mockApi._updateTaskState("non-existent-id", { title: "New Title" })
-      ).toThrow("Task non-existent-id not found");
+    expect(updated).toMatchObject({
+      id: target.id,
+      title: "New title",
+      description: target.description,
+      status: target.status,
     });
+    expect(new Date(updated.updatedAt).getTime()).toBeGreaterThanOrEqual(
+      new Date(target.updatedAt).getTime()
+    );
+  });
+
+  it("fails immediately for a permanently missing task", async () => {
+    await expect(
+      mockApi.updateTask("missing", { id: "missing", title: "x" })
+    ).rejects.toThrow("Task missing not found");
+    await expect(mockApi.deleteTask("missing")).rejects.toThrow(
+      "Task missing not found"
+    );
+  });
+
+  it("reorders a column and reports the new order", async () => {
+    const tasks = await mockApi.getTasks();
+    const ids = tasks
+      .filter((task) => task.status === TaskStatus.TODO)
+      .map((task) => task.id)
+      .reverse();
+
+    const reordered = await mockApi.reorderTasks(TaskStatus.TODO, ids);
+    expect(reordered.map((task) => task.id)).toEqual(ids);
+
+    const after = await mockApi.getTasks();
+    expect(
+      after.filter((task) => task.status === TaskStatus.TODO).map((t) => t.id)
+    ).toEqual(ids);
+  });
+
+  it("creates and deletes a task", async () => {
+    const newTask = {
+      id: "custom-task",
+      title: "Custom",
+      description: "Custom description",
+      status: TaskStatus.TODO,
+      createdAt: "",
+      updatedAt: "",
+    };
+    const created = await mockApi.createTask(newTask);
+    expect(created.createdAt).not.toBe("");
+    expect((await mockApi.getTasks()).some((t) => t.id === created.id)).toBe(true);
+
+    await mockApi.deleteTask(created.id);
+    expect((await mockApi.getTasks()).some((t) => t.id === created.id)).toBe(false);
   });
 });

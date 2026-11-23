@@ -9,7 +9,7 @@ setTwoToneColor(BRAND_COLOR);
 const defaultTheme: ThemeConfig = {
   hashed: false,
   token: {
-    wireframe: true,
+    wireframe: false,
     fontSize: 14,
     borderRadius: 4,
     colorPrimary: BRAND_COLOR,

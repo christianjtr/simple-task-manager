@@ -1,0 +1,86 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+
+import { TaskStatus, type Task } from "@src/types/task";
+import { TaskBoardStage } from "../TaskBoardStage";
+
+jest.mock("@components/OptimizedImage/OptimizedImage", () => ({
+  OptimizedImage: () => <div data-testid="optimized-image" />,
+}));
+
+const task = (id: string, status: TaskStatus): Task => ({
+  id: `task-${id}`,
+  title: `Task ${id}`,
+  description: "description",
+  status,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+  image: {
+    id: `image-${id}`,
+    url: "https://example.com/image.jpg",
+    width: 400,
+    height: 300,
+  },
+});
+
+const onMoveTask = jest.fn().mockResolvedValue(undefined);
+
+const renderStage = (tasks: Task[], status = TaskStatus.TODO) =>
+  render(
+    <TaskBoardStage
+      id={status}
+      title="To Do"
+      status={status}
+      tasks={tasks}
+      onMoveTask={onMoveTask}
+    />
+  );
+
+describe("TaskBoardStage", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("renders an empty column with a drop hint", () => {
+    renderStage([]);
+    expect(screen.getByText("Drop tasks here")).toBeInTheDocument();
+  });
+
+  it("uses the task id as the drag payload", () => {
+    const dataTransfer = {
+      setData: jest.fn(),
+      getData: jest.fn().mockReturnValue("task-1"),
+      effectAllowed: "",
+    };
+    renderStage([task("1", TaskStatus.TODO)]);
+
+    fireEvent.dragStart(screen.getByTestId("task_card_item_task-1"), {
+      dataTransfer,
+    });
+    expect(dataTransfer.setData).toHaveBeenCalledWith("text/plain", "task-1");
+
+    fireEvent.drop(screen.getByTestId("task_board_stage_item_TODO"), {
+      dataTransfer,
+    });
+    expect(onMoveTask).toHaveBeenCalledWith("task-1", TaskStatus.TODO, 1);
+  });
+
+  it("moves to the next column and reorders with keyboard controls", () => {
+    renderStage([task("1", TaskStatus.TODO), task("2", TaskStatus.TODO)]);
+
+    fireEvent.click(screen.getByLabelText("Move Task 1 to next column"));
+    expect(onMoveTask).toHaveBeenCalledWith(
+      "task-1",
+      TaskStatus.IN_PROGRESS,
+      0
+    );
+
+    fireEvent.click(screen.getByLabelText("Move Task 1 down"));
+    expect(onMoveTask).toHaveBeenCalledWith("task-1", TaskStatus.TODO, 1);
+  });
+
+  it("does not offer a previous column in the first stage", () => {
+    renderStage([task("1", TaskStatus.TODO)]);
+    expect(
+      screen.getByLabelText("Move Task 1 to previous column")
+    ).toBeDisabled();
+    expect(screen.getByLabelText("Move Task 1 to next column")).toBeEnabled();
+  });
+});

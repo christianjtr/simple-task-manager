@@ -1,16 +1,38 @@
 @use "@styles/tokens" as *;
 
 .taskBoardStage {
-    background-color: $background-color-standard-200;
-    padding: $spacing-xs;
+  background-color: $background-color-standard-200;
+  padding: $spacing-m;
+  border-radius: 4px;
 
-    .title {
-        margin: 0;
-    }
+  .title {
+    margin: 0;
+  }
+}
 
-    .list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+.count {
+  color: $font-color-support-standard;
+  font-size: $font-size-support;
+  margin-bottom: $spacing-xs;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-s;
+  min-height: 120px;
+}
+
+.cardSlot {
+  border: 2px dashed transparent;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.dropTarget {
+  border-color: $interaction-color-action;
+}
+
+.empty {
+  padding: $spacing-m 0;
 }

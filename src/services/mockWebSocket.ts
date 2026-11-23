@@ -1,157 +1,184 @@
-import { Task, TaskUpdate } from "../types/task";
+import type {
+  ConnectionStatus,
+  TaskOrderPayload,
+  TaskUpdate,
+} from "@src/types/task";
 import { mockApi } from "./mockApi";
+import {
+  taskEventBus,
+  WebSocketEventType,
+  type MessageHandler,
+  type WebSocketMessage,
+} from "./taskEvents";
 
-export enum WebSocketEventType {
-  TASK_UPDATE = "TASK_UPDATE",
-  TASK_CREATE = "TASK_CREATE",
-  TASK_DELETE = "TASK_DELETE",
-}
+export { WebSocketEventType };
+export type { MessageHandler, WebSocketMessage };
 
-interface WebSocketMessage {
-  type: WebSocketEventType;
-  payload: Task | TaskUpdate;
-}
-
-type MessageHandler = (message: WebSocketMessage) => void;
+type Timer = ReturnType<typeof setTimeout>;
 
 class MockWebSocket {
-  private handlers: MessageHandler[] = [];
-  private isConnected: boolean = false;
-  private simulationInterval: NodeJS.Timeout | null = null;
-
+  private status: ConnectionStatus = "disconnected";
+  private statusHandlers = new Set<(status: ConnectionStatus) => void>();
+  private connectPromise: Promise<void> | null = null;
+  private cancelConnect: (() => void) | null = null;
+  private connectTimer: Timer | null = null;
+  private firstUpdateTimer: Timer | null = null;
+  private simulationInterval: ReturnType<typeof setInterval> | null = null;
+  private reconnectTimer: Timer | null = null;
+  private pendingSends = new Set<Timer>();
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
-  private reconnectDelay = 1000;
+  private readonly maxReconnectAttempts = 5;
+  private readonly reconnectDelay = 1000;
+
+  getStatus = (): ConnectionStatus => this.status;
+
+  subscribe = (handler: MessageHandler): (() => void) =>
+    taskEventBus.subscribe(handler);
+
+  subscribeStatus = (handler: (status: ConnectionStatus) => void): (() => void) => {
+    this.statusHandlers.add(handler);
+    return () => {
+      this.statusHandlers.delete(handler);
+    };
+  };
 
   connect(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        this.isConnected = true;
+    if (this.connectPromise) return this.connectPromise;
+    if (this.status === "connected") return Promise.resolve();
+
+    this.setStatus(
+      this.reconnectAttempts > 0 ? "reconnecting" : "connecting"
+    );
+
+    this.connectPromise = new Promise<void>((resolve) => {
+      let canceled = false;
+      this.cancelConnect = () => {
+        canceled = true;
+      };
+      this.connectTimer = setTimeout(() => {
+        this.connectTimer = null;
+        this.cancelConnect = null;
+        this.connectPromise = null;
+        if (canceled) {
+          resolve();
+          return;
+        }
+        this.reconnectAttempts = 0;
+        this.setStatus("connected");
         this.startSimulation();
         resolve();
       }, 500);
     });
+
+    return this.connectPromise;
   }
 
   disconnect(): void {
-    this.isConnected = false;
-    if (this.simulationInterval) {
-      clearInterval(this.simulationInterval);
-      this.simulationInterval = null;
-    }
+    this.cancelConnect?.();
+    this.cancelConnect = null;
+    this.connectPromise = null;
+    if (this.connectTimer) clearTimeout(this.connectTimer);
+    this.connectTimer = null;
+    if (this.firstUpdateTimer) clearTimeout(this.firstUpdateTimer);
+    this.firstUpdateTimer = null;
+    if (this.simulationInterval) clearInterval(this.simulationInterval);
+    this.simulationInterval = null;
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
+    this.pendingSends.forEach((timer) => clearTimeout(timer));
+    this.pendingSends.clear();
+    this.setStatus("disconnected");
   }
 
-  subscribe(handler: MessageHandler): () => void {
-    this.handlers.push(handler);
-    return () => {
-      this.handlers = this.handlers.filter((h) => h !== handler);
-    };
+  simulateDisconnect(): void {
+    this.disconnect();
+    this.reconnect();
   }
 
-  simulateIncomingMessage(message: WebSocketMessage): void {
-    if (!this.isConnected) return;
-
-    // If it's a task update, try to update the internal state
-    if (
-      message.type === WebSocketEventType.TASK_UPDATE &&
-      "id" in message.payload
-    ) {
-      try {
-        mockApi._updateTaskState(message.payload.id, message.payload);
-      } catch {
-        // Silently ignore updates for non-existent tasks
-        // This simulates the behavior of a real system where some tasks
-        // might have been deleted by other users
-        console.debug(
-          "Ignoring update for non-existent task:",
-          message.payload.id
-        );
-      }
-    }
-
-    this.handlers.forEach((handler) => {
-      handler(message);
-    });
+  reconnect(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) return;
+    this.reconnectAttempts += 1;
+    this.setStatus("reconnecting");
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      void this.connect();
+    }, this.reconnectDelay * this.reconnectAttempts);
   }
 
   send(message: WebSocketMessage): void {
-    if (!this.isConnected) {
+    if (this.status !== "connected") {
       console.warn("WebSocket is not connected");
       return;
     }
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
+      this.pendingSends.delete(timer);
       this.simulateIncomingMessage(message);
     }, 100);
+    this.pendingSends.add(timer);
+  }
+
+  simulateIncomingMessage(message: WebSocketMessage): void {
+    if (this.status !== "connected") return;
+
+    if (message.type === WebSocketEventType.TASK_UPDATE) {
+      const payload: TaskUpdate = message.payload;
+      try {
+        mockApi._updateTaskState(payload.id, payload);
+      } catch {
+        console.debug(`Ignoring update for non-existent task: ${payload.id}`);
+      }
+    }
+
+    if (message.type === WebSocketEventType.TASK_REORDER) {
+      const payload: TaskOrderPayload = message.payload;
+      mockApi._reorderTasks(payload.status, payload.ids);
+    }
+
+    taskEventBus.publish(message);
+  }
+
+  private setStatus(status: ConnectionStatus): void {
+    if (this.status === status) return;
+    this.status = status;
+    this.statusHandlers.forEach((handler) => handler(status));
   }
 
   private startSimulation(): void {
-    // Schedule first update with random delay
+    if (this.firstUpdateTimer || this.simulationInterval) return;
+
     const initialDelay = Math.random() * 10_000 + 5_000;
     const intervalDelay = Math.random() * 10_000 + 5_000;
 
-    const firstUpdate = setTimeout(async () => {
-      await this.simulateRandomUpdate();
-
-      // Then start regular interval updates if still connected
-      if (this.isConnected) {
-        this.simulationInterval = setInterval(async () => {
-          await this.simulateRandomUpdate();
+    this.firstUpdateTimer = setTimeout(() => {
+      this.firstUpdateTimer = null;
+      void this.simulateRandomUpdate();
+      if (this.status === "connected" && !this.simulationInterval) {
+        this.simulationInterval = setInterval(() => {
+          void this.simulateRandomUpdate();
         }, intervalDelay);
       }
     }, initialDelay);
-
-    // Clean up first update timeout if disconnected
-    if (!this.isConnected && firstUpdate) {
-      clearTimeout(firstUpdate);
-    }
   }
 
   private async simulateRandomUpdate(): Promise<void> {
-    if (!this.isConnected) return;
+    if (this.status !== "connected") return;
 
     try {
       const allTasks = await mockApi.getTasks();
-
-      // Randomly select a task to update
       const randomTask = allTasks[Math.floor(Math.random() * allTasks.length)];
       if (!randomTask) return;
 
-      // Simulate a random update
-      const updates: Partial<Task> = {
-        title: `${randomTask.title} (edited by another user)`,
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Send the simulated update
       this.simulateIncomingMessage({
         type: WebSocketEventType.TASK_UPDATE,
-        payload: { ...randomTask, ...updates },
+        payload: {
+          id: randomTask.id,
+          title: `${randomTask.title} (edited by another user)`,
+        },
       });
     } catch (error) {
       console.error("Failed to simulate random update:", error);
     }
-  }
-
-  private reconnect(): void {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error("Max reconnection attempts reached.");
-      return;
-    }
-
-    console.log(`Attempting reconnection in ${this.reconnectDelay}ms...`);
-    setTimeout(() => {
-      this.connect().then(() => {
-        console.log("Reconnected.");
-        this.reconnectAttempts = 0;
-        this.reconnectDelay = 1000;
-        this.startSimulation();
-      }).catch(() => {
-        this.reconnectAttempts++;
-        this.reconnectDelay *= 2;
-        this.reconnect();
-      });
-    }, this.reconnectDelay);
   }
 }
 

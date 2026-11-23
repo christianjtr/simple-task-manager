@@ -30,5 +30,5 @@
         "noFallthroughCasesInSwitch": true
     },
     "include": ["src"],
-    "exclude": ["*/__tests__/**"]
+    "exclude": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "**/setupTests.ts"]
 }

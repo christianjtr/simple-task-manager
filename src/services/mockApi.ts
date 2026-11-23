@@ -1,5 +1,8 @@
-import { Task, TaskStatus, TaskImage } from "../types/task";
-import { mockWebSocket, WebSocketEventType } from "./mockWebSocket";
+import type { Task, TaskImage, TaskUpdate } from "../types/task";
+import { TaskStatus } from "../types/task";
+import { taskEventBus, WebSocketEventType } from "./taskEvents";
+
+export const MOCK_TASK_COUNT = 75;
 
 const sampleImages: TaskImage[] = [
   {
@@ -25,31 +28,54 @@ const sampleImages: TaskImage[] = [
   },
 ];
 
-// Shared state to maintain consistency between API and WebSocket
 const taskStore = new Map<string, Task>();
 
+export class TransientApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "TransientApiError";
+  }
+}
+
+const delay = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+async function performRequestWithRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts = 3,
+  retryDelay = 1000
+): Promise<T> {
+  let attempt = 0;
+
+  for (;;) {
+    try {
+      return await fn();
+    } catch (error) {
+      attempt += 1;
+      if (!(error instanceof TransientApiError) || attempt >= maxAttempts) {
+        throw error;
+      }
+      await delay(retryDelay * 2 ** (attempt - 1));
+    }
+  }
+}
+
 const generateMockTasks = (count: number): Task[] => {
-  const statuses: TaskStatus[] = [
+  const statuses = [
     TaskStatus.TODO,
     TaskStatus.IN_PROGRESS,
     TaskStatus.DONE,
   ];
   const tasks: Task[] = [];
 
-  for (let i = 0; i < count; i++) {
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
+  for (let i = 0; i < count; i += 1) {
+    const status = statuses[i % statuses.length];
     const now = new Date().toISOString();
+    const hasImage = i % 3 === 0;
+    const sample = sampleImages[i % sampleImages.length];
+    const image = hasImage && sample ? { ...sample, id: `img-${i + 1}` } : undefined;
 
-    // Randomly decide if this task should have an image (30% chance)
-    const hasImage = Math.random() < 0.3;
-    const image = hasImage
-      ? {
-        ...sampleImages[Math.floor(Math.random() * sampleImages.length)],
-        id: `img-${i + 1}`,
-      }
-      : undefined;
-
-    const task = {
+    const task: Task = {
       id: `task-${i + 1}`,
       title: `Task ${i + 1}`,
       description: `This is a description for task ${i + 1}`,
@@ -66,119 +92,94 @@ const generateMockTasks = (count: number): Task[] => {
   return tasks;
 };
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function performRequestWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, retryDelay = 1000): Promise<T> {
-  let retries = 0;
-  let lastError: unknown;
-
-  while (retries < maxRetries) {
-    try {
-      return await fn();
-    } catch (error) {
-      console.error(`Request failed, retrying in ${retryDelay}ms...`, error);
-      retries++;
-      lastError = error;
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      retryDelay *= 2;
-    }
-  }
-
-  throw lastError || new Error("Max retries exceeded");
-}
-
 export const mockApi = {
-  getTasks: async (): Promise<Task[]> => {
-    return performRequestWithRetry(async () => {
+  getTasks: (): Promise<Task[]> =>
+    performRequestWithRetry(async () => {
       await delay(800);
       return Array.from(taskStore.values());
-    });
-  },
+    }),
 
-  updateTask: async (taskId: string, updates: Partial<Task>): Promise<Task> => {
-    return performRequestWithRetry(async () => {
+  updateTask: (taskId: string, updates: TaskUpdate): Promise<Task> =>
+    performRequestWithRetry(async () => {
       await delay(300);
-
-      const existingTask = taskStore.get(taskId);
-      if (!existingTask) {
-        throw new Error(`Task ${taskId} not found`);
-      }
-
-      const updatedTask = {
-        ...existingTask,
-        ...updates,
-        updatedAt: new Date().toISOString(),
-      };
-
-      taskStore.set(taskId, updatedTask);
-
-      mockWebSocket.send({
+      const updatedTask = mockApi._updateTaskState(taskId, updates);
+      taskEventBus.publish({
         type: WebSocketEventType.TASK_UPDATE,
         payload: updatedTask,
       });
-
       return updatedTask;
-    });
-  },
+    }),
 
-  createTask: async (newTask: Task): Promise<Task> => {
-    return performRequestWithRetry(async () => {
+  createTask: (newTask: Task): Promise<Task> =>
+    performRequestWithRetry(async () => {
       await delay(300);
-
-      const task = {
-        ...newTask,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
+      const now = new Date().toISOString();
+      const task: Task = { ...newTask, createdAt: now, updatedAt: now };
       taskStore.set(task.id, task);
-
-      mockWebSocket.send({
+      taskEventBus.publish({
         type: WebSocketEventType.TASK_CREATE,
         payload: task,
       });
-
       return task;
-    });
-  },
+    }),
 
-  deleteTask: async (taskId: string): Promise<void> => {
-    return performRequestWithRetry(async () => {
+  deleteTask: (taskId: string): Promise<void> =>
+    performRequestWithRetry(async () => {
       await delay(300);
-
-      if (!taskStore.has(taskId)) {
+      const deletedTask = taskStore.get(taskId);
+      if (!deletedTask) {
         throw new Error(`Task ${taskId} not found`);
       }
-
-      const deletedTask = taskStore.get(taskId);
       taskStore.delete(taskId);
-
-      taskStore.delete(taskId);
-
-      mockWebSocket.send({
+      taskEventBus.publish({
         type: WebSocketEventType.TASK_DELETE,
-        payload: deletedTask!,
+        payload: { id: deletedTask.id },
       });
-    });
-  },
+    }),
 
-  // Internal method to update task state without delay
-  _updateTaskState: (taskId: string, updates: Partial<Task>): Task => {
+  reorderTasks: (status: TaskStatus, ids: string[]): Promise<Task[]> =>
+    performRequestWithRetry(async () => {
+      await delay(150);
+      const ordered = mockApi._reorderTasks(status, ids);
+      taskEventBus.publish({
+        type: WebSocketEventType.TASK_REORDER,
+        payload: { status, ids },
+      });
+      return ordered;
+    }),
+
+  _updateTaskState: (taskId: string, updates: TaskUpdate): Task => {
     const existingTask = taskStore.get(taskId);
     if (!existingTask) {
       throw new Error(`Task ${taskId} not found`);
     }
 
-    const updatedTask = {
+    const updatedTask: Task = {
       ...existingTask,
       ...updates,
       updatedAt: new Date().toISOString(),
     };
-
     taskStore.set(taskId, updatedTask);
     return updatedTask;
   },
+
+  _reorderTasks: (status: TaskStatus, ids: string[]): Task[] => {
+    const reordered = ids
+      .map((id) => taskStore.get(id))
+      .filter((task): task is Task => Boolean(task && task.status === status));
+    const untouched = Array.from(taskStore.values()).filter(
+      (task) => !ids.includes(task.id)
+    );
+    const nextTasks = [...untouched, ...reordered];
+    taskStore.clear();
+    nextTasks.forEach((task) => taskStore.set(task.id, task));
+    return reordered;
+  },
+
+  reset: (): void => {
+    taskStore.clear();
+    generateMockTasks(MOCK_TASK_COUNT);
+  },
 };
 
-// Initialize the store
-generateMockTasks(75);
+generateMockTasks(MOCK_TASK_COUNT);

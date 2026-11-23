@@ -1,116 +1,112 @@
 # Simple Task Manager
 
-This assessment requires the development of a real-time task manager, featuring a Kanban board interface. Data synchronization will be achieved through a WebSocket service.
+A real-time Kanban task manager built with React, TypeScript, Redux Toolkit, Ant Design and SASS. The app loads 75 mock tasks, synchronizes task changes through a simulated WebSocket, and supports accessible drag-and-drop and keyboard task movement.
 
-> [!NOTE]
->
-> -   ❤️ Feel free to add any improvements or suggestions you consider.
+## Contents
 
-1. [Goals](#001)
-2. [Tech Stack](#002)
-3. [Installation and running the project](#003)
-4. [Samples](#004)
-5. [Dev notes](#005)
-6. [Next steps](#006)
+1. [Goals](#goals)
+2. [Tech stack](#tech-stack)
+3. [Installation and running](#installation-and-running)
+4. [Architecture](#architecture)
+5. [Assumptions and limitations](#assumptions-and-limitations)
+6. [Testing](#testing)
+7. [Samples](#samples)
 
-<a name="001"></a>
+## Goals
 
-### 🎯 Goals
+The implementation covers the core challenge requirements:
 
-###### More details in CHALLENGE.md file
+- Real-time task synchronization through a provided mock WebSocket service.
+- A three-column board: **To Do**, **In Progress**, and **Done**.
+- Drag-and-drop reordering and movement between columns, plus keyboard controls.
+- Task images rendered through a cached, fallback-aware `OptimizedImage` component.
+- 75 pre-populated tasks loaded from a mock API.
+- Graceful handling of API failures, WebSocket disconnections, and reconnection.
+- Unit tests, one integration test, and a production build with type checking.
 
--   Enable real-time synchronization of tasks using a provided mock WebSocket server.
--   Create a task board with three columns: To Do, In Progress, and Done.
--   Implement drag-and-drop functionality to reorder tasks or move them between columns.
--   Load a pre-populated list of 50-100 tasks from a mock API
+## Tech stack
 
-<a name="002"></a>
+- **Framework:** React 18 and TypeScript
+- **Build:** Vite 6
+- **State:** Redux Toolkit and React Redux
+- **UI:** Ant Design 5, Ant Design icons, SASS modules
+- **Testing:** Jest, ts-jest, Testing Library, jest-dom
+- **Tooling:** ESLint flat config, TypeScript project references
 
-### Tech Stack
+## Installation and running
 
-This conceptual test has been developed using the following technologies:
+Requirements:
 
--   **Front-end**
-    -   [React](https://react.dev/)
-    -   [TypeScript](https://www.typescriptlang.org/)
-    -   [Ant Design](https://ant.design/)
-
-<a name="003"></a>
-
-### Installation and running the project
-
-The project requires:
-
--   [NodeJS](https://nodejs.org/)
-
-**Clone the repository:**
+- Node.js 18 or newer
+- npm
 
 ```shell
 git clone https://github.com/christianjtr/simple-task-manager.git
+cd simple-task-manager
+npm install
 ```
 
-**Scripts:**
-
-Before executing these scripts, you must run **npm install** in the directory you just downloaded/cloned the codebase. _Other scripts are in package.json file. Also, you may consult the CHALLENGE.md file_.
+Scripts:
 
 ```shell
-# Start the development environment
-> npm run dev
-
-# Run unit tests
-> npm run test
-
+npm run dev        # start Vite in development mode
+npm run build      # type check with tsc -b and build for production
+npm run preview    # preview the production build
+npm run lint       # lint with zero warnings allowed
+npm test           # run the Jest suite once
+npm run test:watch # run Jest in watch mode
 ```
 
-<a name="004"></a>
+## Architecture
 
-### Samples
+The data flow is deliberately layered so services, state, and UI stay decoupled:
 
-1. Basic kanban board
+```text
+mockApi / mockWebSocket
+        -> taskEvents (typed event bus)
+        -> useTaskService (orchestration + validation)
+        -> taskSlice (Redux state)
+        -> TaskBoard / TaskBoardStage / TaskCard (UI)
+```
+
+Key pieces:
+
+- `src/services/mockApi.ts`: in-memory task API. Supports fetch, create, update, delete, reorder, transient error retries, and deterministic task data.
+- `src/services/mockWebSocket.ts`: simulated connection lifecycle with `connect`, `subscribe`, `send`, `simulateDisconnect`, `reconnect`, and connection-status subscriptions.
+- `src/services/taskEvents.ts`: typed bus that prevents a circular dependency between the mock API and mock WebSocket.
+- `src/hooks/useTaskService.ts`: validates incoming messages, dispatches Redux actions, handles reconnection, and performs optimistic moves with rollback.
+- `src/store/taskSlice.ts`: owns tasks, loading state, error state, connection status, and ordering actions.
+- `src/components/TaskBoard`: renders three always-present stages, Ant Design feedback, and retry UI.
+- `src/components/OptimizedImage`: caches optimized image data URLs, uses async decoding, preserves dimensions, and falls back safely on failure.
+
+Task data is validated at the service boundary with `isTask`, `isTaskUpdate`, and `isTaskOrderPayload` in `src/types/task.ts`.
+
+## Assumptions and limitations
+
+- The mock API and mock WebSocket are in-memory only. Refreshing the page restores the initial 75-task data set.
+- No backend is required or configured. Real-time updates are simulated inside the browser.
+- Connection status is displayed in the header as `Live`, `Connecting`, `Reconnecting`, or `Offline`.
+- Drag-and-drop uses native HTML5 DnD plus keyboard controls. No third-party DnD library is used.
+- The stretch goals for filtering and inline editing are not implemented.
+- There is no offline queue; updates made while disconnected are rejected with user feedback.
+- The production build emits a Vite chunk-size warning because Ant Design and Redux are bundled together. It does not affect correctness.
+
+## Testing
+
+The suite contains 30 tests across 7 suites, including a real-time integration test that verifies API-to-WebSocket-to-store-to-UI propagation.
+
+```shell
+npm test
+npm run lint
+npm run build
+```
+
+Tests use alias-aware TypeScript configuration in `tsconfig.test.json` and jsdom browser API polyfills in `src/setupTests.ts`.
+
+## Samples
+
+Basic Kanban board:
 
 <p align="center">
-  <img src="https://github.com/christianjtr/simple-task-manager/blob/main/samples/kanban.gif"/>
+  <img src="https://raw.githubusercontent.com/christianjtr/simple-task-manager/main/samples/kanban.gif" alt="Kanban board sample" />
 </p>
-
-<a name="005"></a>
-
-### Dev notes
-
-###### Strategy followed
-
-1. Basic implementation of Kanban Board UI (Component Composition)
-2. Integrate WebSocket Data Synchronization (Custom Hook)
-3. Redux integration (WebSocket/MockAPI orchestration)
-4. Implement task management features
-5. Ensure some real-time updates
-
-###### Component composition
-
-```mermaid
-graph TD
-    A[TaskBoard] -->|Stages| B(TaskBoardStage 1);
-    A -->|Stages| C(TaskBoardStage 2);
-    A -->|Stages| D(TaskBoardStage 3);
-    B -->|Tasks| E[TaskCard 1];
-    B -->|Tasks| F[TaskCard 2];
-    C -->|Tasks| G[TaskCard 3];
-    D -->|Tasks| H[TaskCard 4];
-    D -->|Tasks| I[TaskCard 5];
-    style A fill:#f9f,stroke:#333,stroke-width:2px;
-```
-
-<a name="006"></a>
-
-### Next steps
-
-1. Fine-tune the application and enhance overall styles.
-    - Align components with third-party design framework (Ant Design).
-2. Polish interactions, e.g., transition tasks across statuses.
-    - Work on transitions, animations, affordance, and similar.
-3. Improve the syncing process between the service layer and state manager.
-    - Better management of WebSocket/Redux layers.
-    - Offline support.
-4. Optimize performance and elevate error handling.
-    - Manage assets, caching strategies, etc.
-    - Make sure that potential flaws are covered.
-5. Add unit tests to the implementation.
