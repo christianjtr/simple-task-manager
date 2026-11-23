@@ -60,7 +60,7 @@ pnpm check:fix   # Biome format and lint with fixes
 pnpm lint        # Biome lint only
 pnpm test        # run the Vitest suite once
 pnpm test:watch  # run Vitest in watch mode
-pnpm test:e2e    # run the Playwright smoke test
+pnpm test:e2e    # run the Playwright smoke tests
 ```
 
 ## Architecture
@@ -88,11 +88,11 @@ Key pieces:
 - `src/styles/tailwind.css` / `src/styles/themes/default.ts`: semantic light/dark theme tokens.
 - `src/hooks/useProjects.ts` / `src/hooks/useTasks.ts`: reactive reads from IndexedDB.
 - `src/hooks/useActiveProject.ts` / `src/hooks/useTheme.ts`: persisted UI preferences.
-- `src/components/Header/Header.tsx`: project title, theme toggle, and the ordered Help/Data/Theme icon actions.
+- `src/components/Header/Header.tsx`: sticky top bar with project title and description separated by a vertical rule, plus ordered Help/Data/Theme icon actions.
 - `src/components/HelpDrawer/HelpDrawer.tsx`: storage limits, JSON contract, and import behavior.
-- `src/components/Sidebar/Sidebar.tsx`: project navigation, `N / 50` counter, 3-point Edit/Delete menu, and creation limit UI.
+- `src/components/Sidebar/Sidebar.tsx`: full-height project navigation, top double-chevron collapse control, `N / 50` counter, 3-point Edit/Delete menu, and creation limit UI.
 - `src/components/BackupActions/BackupActions.tsx`: JSON export/import UI.
-- `src/components/TaskBoard/TaskBoard.tsx`: filters, CRUD actions, and dnd-kit context.
+- `src/components/TaskBoard/TaskBoard.tsx`: task count chip, filters, CRUD actions, and dnd-kit context.
 - `src/components/TaskBoard/components/TaskBoardStage/TaskBoardStage.tsx`: droppable columns.
 - `src/components/TaskBoard/components/TaskCard/TaskCard.tsx`: sortable cards and keyboard handle.
 
@@ -116,7 +116,7 @@ Import uses `bulkPut`, so an incoming ID replaces an existing local record with 
 
 ## Testing
 
-The suite currently contains 40 tests across 13 files.
+The suite currently contains 42 tests across 13 files.
 
 ```shell
 pnpm check
@@ -130,7 +130,7 @@ Unit/integration tests use `fake-indexeddb/auto` and jsdom polyfills from `src/s
 
 ## Modernization
 
-The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in ten more, each developed in its own branch and merged locally into `main`.
+The original implementation was a mock real-time Kanban demo backed by Redux and an in-browser fake WebSocket. It was modernized in eight reviewable stages and then refined in thirteen more, each developed in its own branch and merged locally into `main`.
 
 | Stage | Branch                                   | Commit    | Outcome                                                |
 | ----- | ---------------------------------------- | --------- | ------------------------------------------------------ |
@@ -154,12 +154,15 @@ Refinements continued in dedicated branches:
 | 13    | `refinement/13-project-limit`           | `ce0e195` | 50-project cap, sidebar counter, disabled creation        |
 | 14    | `refinement/14-docs-final-qa`           | `19593c4` | Final documentation and verification gate                 |
 
-| Stage | Branch                           | Commit    | Outcome                                                   |
-| ----- | -------------------------------- | --------- | --------------------------------------------------------- |
-| 15    | `refinement/15-project-actions`  | `55e1218` | 3-point project menu, project editing, and delete confirm |
-| 16    | `refinement/16-header-actions`   | `5bf40a4` | Light header surface, ordered icon actions, `Sun` toggle  |
-| 17    | `refinement/17-accent-and-brand` | `f6b64a2` | Shared dark purple palette and token-only accent classes  |
-| 18    | `refinement/18-final-qa-docs`    | current   | Updated documentation and full verification gate          |
+| Stage | Branch                                        | Commit    | Outcome                                                   |
+| ----- | --------------------------------------------- | --------- | --------------------------------------------------------- |
+| 15    | `refinement/15-project-actions`               | `55e1218` | 3-point project menu, project editing, and delete confirm |
+| 16    | `refinement/16-header-actions`                | `5bf40a4` | Light header surface, ordered icon actions, `Sun` toggle  |
+| 17    | `refinement/17-accent-and-brand`              | `f6b64a2` | Shared dark purple palette and token-only accent classes  |
+| 18    | `refinement/18-final-qa-docs`                 | `a33facf` | Updated documentation and full verification gate          |
+| 19    | `refinement/19-task-chip-brand-title`         | `65e7f27` | Task count chip and larger `Tasklane` brand               |
+| 20    | `refinement/20-sidebar-trigger-inline-header` | `28d8160` | In-sidebar collapse toggle and sticky project header      |
+| 21    | `refinement/21-final-qa-docs`                 | current   | Final documentation and full verification gate            |
 
 Notable decisions:
 
@@ -170,6 +173,7 @@ Notable decisions:
 - The shared accent palette is `#6366f1` in light mode, `#818cf8` for dark hover/strong text, and `rgba(99,102,241,0.22)` for soft surfaces.
 - Ant Design Modal and Drawer use `destroyOnHidden` (not the older `destroyOnClose`).
 - The sidebar collapse state is intentionally session-only; it is not persisted.
+- The header remains a separate sticky top bar outside the task panel; collapse is controlled only from the sidebar.
 - GitHub Pages builds use `DEMO_BASE=true` to set the Vite base path to `/simple-task-manager/`.
 
 ## Demo deployment

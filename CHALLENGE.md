@@ -157,7 +157,7 @@ The repository was later modernized from the original mock real-time challenge i
 | Native drag-and-drop            | Replaced by dnd-kit with `DragOverlay` and keyboard announcements.                                                                   |
 | `OptimizedImage`                | Removed; cards focus on title, description, priority, due date, and tags.                                                            |
 | API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI.                                                      |
-| Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test.                                                             |
+| Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus Playwright smoke tests.                                                              |
 | Type-checked production build   | `pnpm build` runs `tsc -b` before Vite.                                                                                              |
 
 ### Review stages
@@ -185,3 +185,6 @@ Refinement stages:
 16. `refinement/16-header-actions` — header surface, icon order, and theme icon cleanup.
 17. `refinement/17-accent-and-brand` — shared dark purple accent palette.
 18. `refinement/18-final-qa-docs` — updated documentation and full verification gate.
+19. `refinement/19-task-chip-brand-title` — task count chip and larger `Tasklane` brand.
+20. `refinement/20-sidebar-trigger-inline-header` — in-sidebar collapse control and sticky project header.
+21. `refinement/21-final-qa-docs` — final documentation and full verification gate.
