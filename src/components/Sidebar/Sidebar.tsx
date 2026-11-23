@@ -182,7 +182,7 @@ export const Sidebar = ({
   return (
     <aside className="flex h-full flex-col bg-white dark:bg-slate-900">
       <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
-        <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-indigo-600 text-white">
+        <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--brand)] text-white">
           <AppstoreOutlined />
         </span>
         {!collapsed && (

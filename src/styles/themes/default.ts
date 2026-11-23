@@ -3,7 +3,9 @@ import type { ThemeMode } from "@src/hooks/useTheme";
 import { theme as antdTheme, type ThemeConfig } from "antd";
 
 const BRAND_COLOR = "#6366f1";
-const DARK_BRAND_COLOR = "#818cf8";
+const BRAND_HOVER_COLOR = "#4f46e5";
+const DARK_BRAND_COLOR = "#6366f1";
+const DARK_BRAND_HOVER_COLOR = "#818cf8";
 const WHITE_COLOR = "#ffffff";
 
 const sharedTokens = {
@@ -23,7 +25,7 @@ const lightTokens = {
   colorPrimary: BRAND_COLOR,
   colorLink: BRAND_COLOR,
   colorInfo: BRAND_COLOR,
-  colorLinkHover: "#4f46e5",
+  colorLinkHover: BRAND_HOVER_COLOR,
   colorTextBase: "#0f172a",
   colorTextSecondary: "#64748b",
   colorBgBase: WHITE_COLOR,
@@ -32,9 +34,9 @@ const lightTokens = {
 
 const darkTokens = {
   colorPrimary: DARK_BRAND_COLOR,
-  colorLink: DARK_BRAND_COLOR,
+  colorLink: DARK_BRAND_HOVER_COLOR,
   colorInfo: DARK_BRAND_COLOR,
-  colorLinkHover: "#a5b4fc",
+  colorLinkHover: DARK_BRAND_HOVER_COLOR,
   colorTextBase: "#e2e8f0",
   colorTextSecondary: "#94a3b8",
   colorBgBase: "#0f172a",
@@ -49,7 +51,7 @@ const baseTheme: ThemeConfig = {
 
 export function getThemeConfig(mode: ThemeMode): ThemeConfig {
   const isDark = mode === "dark";
-  setTwoToneColor(isDark ? DARK_BRAND_COLOR : BRAND_COLOR);
+  setTwoToneColor(isDark ? DARK_BRAND_HOVER_COLOR : BRAND_COLOR);
 
   return {
     ...baseTheme,

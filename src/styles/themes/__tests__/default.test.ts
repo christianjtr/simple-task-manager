@@ -19,7 +19,9 @@ describe("getThemeConfig", () => {
 
     expect(config.algorithm).toBe(antdTheme.darkAlgorithm);
     expect(config.token).toMatchObject({
-      colorPrimary: "#818cf8",
+      colorPrimary: "#6366f1",
+      colorLink: "#818cf8",
+      colorLinkHover: "#818cf8",
       colorTextBase: "#e2e8f0",
       colorBgBase: "#0f172a",
       colorBgLayout: "#020617",

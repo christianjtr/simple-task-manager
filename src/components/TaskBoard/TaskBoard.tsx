@@ -266,7 +266,7 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
           </div>
           <DragOverlay>
             {activeTask ? (
-              <div className="rounded-lg border border-indigo-400 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-lg dark:border-indigo-500 dark:bg-slate-800 dark:text-slate-50">
+              <div className="rounded-lg border border-[var(--brand)] bg-[var(--surface)] px-3 py-2 text-sm font-medium text-[var(--content)] shadow-lg">
                 {activeTask.title}
               </div>
             ) : null}
