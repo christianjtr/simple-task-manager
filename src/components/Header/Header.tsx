@@ -5,6 +5,7 @@ import {
   MoonOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { BackupActions } from "@src/components/BackupActions/BackupActions";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
 import { Avatar, Button, Layout, Space, Tooltip, Typography } from "antd";
@@ -48,6 +49,7 @@ export const Header = ({
     </div>
 
     <Space size="middle">
+      <BackupActions />
       <Tooltip title={theme === "dark" ? "Modo claro" : "Modo oscuro"}>
         <Button
           type="text"

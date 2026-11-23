@@ -1,12 +1,13 @@
 import { db } from "@src/db/database";
 import { loadExampleData } from "@src/db/seed";
-
+import { exportBackup } from "../task.import-export";
 import {
   createProject,
   createTask,
   deleteProject,
   deleteTask,
   getTask,
+  importBackupIntoDb,
   listProjects,
   listTasks,
   moveTask,
@@ -90,5 +91,22 @@ describe("task repository", () => {
 
     expect(await listProjects()).toHaveLength(1);
     expect(await listTasks()).toHaveLength(3);
+  });
+
+  it("imports a versioned backup into IndexedDB", async () => {
+    const project = await createProject({ name: "Origen" });
+    const task = await createTask({ projectId: project.id, title: "Tarea" });
+    const backup = exportBackup([project], [task]);
+
+    const result = await importBackupIntoDb(JSON.parse(JSON.stringify(backup)));
+
+    expect(result).toMatchObject({
+      importedProjects: 1,
+      importedTasks: 1,
+      skippedProjects: 0,
+      skippedTasks: 0,
+    });
+    expect(await listProjects()).toHaveLength(1);
+    expect(await listTasks()).toHaveLength(1);
   });
 });

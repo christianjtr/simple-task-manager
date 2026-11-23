@@ -1,5 +1,6 @@
 import { db } from "@src/db/database";
 
+import { type ImportResult, importBackup as parseBackup } from "./task.import-export";
 import { projectSchema, taskSchema } from "./task.schema";
 import { type Project, type Task, TaskStatus } from "./task.types";
 import { createId, nextPosition, sortTasks } from "./task.utils";
@@ -15,6 +16,15 @@ export type TaskPatch = Partial<Omit<Task, "id" | "createdAt">>;
 
 export async function listProjects(): Promise<Project[]> {
   return db.projects.orderBy("name").toArray();
+}
+
+export async function importBackupIntoDb(value: unknown): Promise<ImportResult> {
+  const result = parseBackup(value);
+  await db.transaction("rw", db.projects, db.tasks, async () => {
+    await db.projects.bulkPut(result.projects);
+    await db.tasks.bulkPut(result.tasks);
+  });
+  return result;
 }
 
 export async function getProject(id: string): Promise<Project | undefined> {
