@@ -1,3 +1,4 @@
+import { DndContext } from "@dnd-kit/core";
 import { type Task, TaskStatus } from "@src/features/tasks/task.types";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
@@ -24,13 +25,15 @@ const onMoveTask = vi.fn().mockResolvedValue(undefined);
 
 const renderStage = (tasks: Task[], status = TaskStatus.TODO) =>
   render(
-    <TaskBoardStage
-      id={status}
-      title="To Do"
-      status={status}
-      tasks={tasks}
-      onMoveTask={onMoveTask}
-    />,
+    <DndContext>
+      <TaskBoardStage
+        id={status}
+        title="To Do"
+        status={status}
+        tasks={tasks}
+        onMoveTask={onMoveTask}
+      />
+    </DndContext>,
   );
 
 describe("TaskBoardStage", () => {
@@ -41,23 +44,12 @@ describe("TaskBoardStage", () => {
     expect(screen.getByText("Drop tasks here")).toBeInTheDocument();
   });
 
-  it("uses the task id as the drag payload", () => {
-    const dataTransfer = {
-      setData: vi.fn(),
-      getData: vi.fn().mockReturnValue("task-1"),
-      effectAllowed: "",
-    };
+  it("exposes a keyboard-accessible drag handle for each task", () => {
     renderStage([task("1", TaskStatus.TODO)]);
 
-    fireEvent.dragStart(screen.getByTestId("task_card_item_task-1"), {
-      dataTransfer,
-    });
-    expect(dataTransfer.setData).toHaveBeenCalledWith("text/plain", "task-1");
-
-    fireEvent.drop(screen.getByTestId("task_board_stage_item_TODO"), {
-      dataTransfer,
-    });
-    expect(onMoveTask).toHaveBeenCalledWith("task-1", TaskStatus.TODO, 1);
+    const handle = screen.getByRole("button", { name: "Arrastrar Task 1" });
+    expect(handle).toBeInTheDocument();
+    expect(handle).toHaveAttribute("tabindex", "0");
   });
 
   it("moves to the next column and reorders with keyboard controls", () => {

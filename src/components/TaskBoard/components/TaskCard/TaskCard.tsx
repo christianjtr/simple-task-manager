@@ -5,12 +5,15 @@ import {
   ArrowUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  HolderOutlined,
 } from "@ant-design/icons";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "@src/features/tasks/task.types";
 import { formatDueDate, toIsoString } from "@src/features/tasks/task.utils";
 import { formatDateForDisplay } from "@src/utils/formatDateForDisplay";
-import { Button, Card, Popconfirm, Tag, Tooltip, Typography } from "antd";
-import { type DragEventHandler, useMemo } from "react";
+import { Button, Card, Popconfirm, Space, Tag, Tooltip, Typography } from "antd";
+import { type CSSProperties, useMemo } from "react";
 import styles from "./TaskCard.module.scss";
 
 const { Text } = Typography;
@@ -19,10 +22,6 @@ export type TaskMoveDirection = "up" | "down" | "previous" | "next";
 
 interface TaskCardProps extends Task {
   className?: string;
-  onDragStart?: DragEventHandler<HTMLLIElement>;
-  onDragEnd?: DragEventHandler<HTMLLIElement>;
-  onDragOver?: DragEventHandler<HTMLLIElement>;
-  onDrop?: DragEventHandler<HTMLLIElement>;
   onMove?: (direction: TaskMoveDirection) => void;
   onEdit?: (task: Task) => void;
   onDelete?: (id: string) => void;
@@ -51,10 +50,6 @@ const TaskCard = ({
   createdAt,
   updatedAt,
   className,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDrop,
   onMove,
   onEdit,
   onDelete,
@@ -63,10 +58,29 @@ const TaskCard = ({
   canMovePrevious = false,
   canMoveNext = false,
 }: TaskCardProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+    data: { type: "task", status },
+  });
+
   const updatedAtToDisplay = useMemo(
     () => formatDateForDisplay(toIsoString(updatedAt)),
     [updatedAt],
   );
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
 
   const handleEdit = () => {
     onEdit?.({
@@ -86,18 +100,29 @@ const TaskCard = ({
 
   return (
     <li
+      ref={setNodeRef}
       id={id}
       data-testid={`task_card_item_${id}`}
       className={`${styles.cardWrapper} ${className ?? ""}`}
-      draggable={Boolean(onDragStart)}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
+      style={style}
     >
       <Card
         title={title}
-        extra={<Tag color={priorityColors[priority]}>{priority}</Tag>}
+        extra={
+          <Space size={4}>
+            <Tag color={priorityColors[priority]}>{priority}</Tag>
+            <button
+              ref={setActivatorNodeRef}
+              type="button"
+              className={styles.dragHandle}
+              aria-label={`Arrastrar ${title}`}
+              {...attributes}
+              {...listeners}
+            >
+              <HolderOutlined />
+            </button>
+          </Space>
+        }
         className={styles.taskCard}
       >
         <div className="mb-2 flex flex-wrap items-center gap-1">

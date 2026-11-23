@@ -1,6 +1,7 @@
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { Task, TaskStatus } from "@src/features/tasks/task.types";
 import { Empty, Typography } from "antd";
-import { type DragEvent, useState } from "react";
 import { STAGE_ORDER } from "../../stages";
 import { TaskCard, type TaskMoveDirection } from "../TaskCard/TaskCard";
 import styles from "./TaskBoardStage.module.scss";
@@ -26,18 +27,11 @@ const TaskBoardStage = ({
   onEditTask,
   onDeleteTask,
 }: TaskBoardStageProps) => {
-  const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const { setNodeRef, isOver } = useDroppable({
+    id: `column:${status}`,
+    data: { type: "column", status },
+  });
   const stagePosition = STAGE_ORDER.indexOf(status);
-
-  const handleDrop = (index: number, event: DragEvent<HTMLElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const taskId = event.dataTransfer.getData("text/plain") || draggedId;
-    setDraggedId(null);
-    setDropIndex(null);
-    if (taskId) void onMoveTask?.(taskId, status, index);
-  };
 
   const handleMove = (taskId: string, direction: TaskMoveDirection) => {
     const index = tasks.findIndex((task) => task.id === taskId);
@@ -62,50 +56,38 @@ const TaskBoardStage = ({
       className={styles.taskBoardStage}
       data-testid={`task_board_stage_item_${id}`}
       aria-label={`${title} column`}
-      onDragOver={(event) => event.preventDefault()}
-      onDrop={(event) => handleDrop(tasks.length, event)}
     >
       <Title level={4} className={styles.title}>
         {title}
       </Title>
       <span className={styles.count}>{tasks.length}</span>
-      <ul className={styles.list}>
-        {tasks.length === 0 && (
-          <li>
-            <Empty description="Drop tasks here" className={styles.empty} />
-          </li>
-        )}
-        {tasks.map((task, index) => (
-          <TaskCard
-            {...task}
-            key={task.id}
-            className={`${styles.cardSlot} ${
-              dropIndex === index && draggedId ? styles.dropTarget : ""
-            }`}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDropIndex(index);
-            }}
-            onDrop={(event) => handleDrop(index, event)}
-            onDragStart={(event) => {
-              event.dataTransfer.setData("text/plain", task.id);
-              event.dataTransfer.effectAllowed = "move";
-              setDraggedId(task.id);
-            }}
-            onDragEnd={() => {
-              setDraggedId(null);
-              setDropIndex(null);
-            }}
-            onMove={(direction) => handleMove(task.id, direction)}
-            onEdit={onEditTask}
-            onDelete={onDeleteTask}
-            canMoveUp={index > 0}
-            canMoveDown={index < tasks.length - 1}
-            canMovePrevious={stagePosition > 0}
-            canMoveNext={stagePosition < STAGE_ORDER.length - 1}
-          />
-        ))}
-      </ul>
+      <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+        <ul
+          ref={setNodeRef}
+          className={`${styles.list} ${isOver ? styles.dropTarget : ""}`}
+          aria-label={`${title} task list`}
+        >
+          {tasks.length === 0 && (
+            <li>
+              <Empty description="Drop tasks here" className={styles.empty} />
+            </li>
+          )}
+          {tasks.map((task, index) => (
+            <TaskCard
+              {...task}
+              key={task.id}
+              className={styles.cardSlot}
+              onMove={(direction) => handleMove(task.id, direction)}
+              onEdit={onEditTask}
+              onDelete={onDeleteTask}
+              canMoveUp={index > 0}
+              canMoveDown={index < tasks.length - 1}
+              canMovePrevious={stagePosition > 0}
+              canMoveNext={stagePosition < STAGE_ORDER.length - 1}
+            />
+          ))}
+        </ul>
+      </SortableContext>
     </section>
   );
 };
