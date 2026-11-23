@@ -1,21 +1,20 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
-import { Provider } from "react-redux";
-import { App as AntApp } from "antd";
 
-import taskSlice from "../../../store/taskSlice";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { App as AntApp } from "antd";
+import { Provider } from "react-redux";
+import { type MockedFunction, vi } from "vitest";
 import { useTaskService } from "../../../hooks/useTaskService";
-import { TaskStatus, type Task } from "../../../types/task";
+import taskSlice from "../../../store/taskSlice";
+import { type Task, TaskStatus } from "../../../types/task";
 import { TaskBoard } from "../TaskBoard";
 
-jest.mock("../../../hooks/useTaskService", () => ({
-  useTaskService: jest.fn(),
+vi.mock("../../../hooks/useTaskService", () => ({
+  useTaskService: vi.fn(),
 }));
 
-const mockUseTaskService = useTaskService as jest.MockedFunction<
-  typeof useTaskService
->;
-const messageMock = { success: jest.fn(), error: jest.fn() };
+const mockUseTaskService = useTaskService as MockedFunction<typeof useTaskService>;
+const messageMock = { success: vi.fn(), error: vi.fn() };
 
 const task = (id: string, status: TaskStatus): Task => ({
   id,
@@ -26,23 +25,23 @@ const task = (id: string, status: TaskStatus): Task => ({
   updatedAt: "2026-01-01T00:00:00.000Z",
 });
 
-const reload = jest.fn();
-const moveTask = jest.fn();
+const reload = vi.fn();
+const moveTask = vi.fn();
 
 const renderBoard = () => {
   const store = configureStore({ reducer: { tasks: taskSlice } });
   return render(
     <Provider store={store}>
       <TaskBoard />
-    </Provider>
+    </Provider>,
   );
 };
 
 describe("TaskBoard", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     reload.mockResolvedValue(undefined);
-    jest.spyOn(AntApp, "useApp").mockReturnValue({
+    vi.spyOn(AntApp, "useApp").mockReturnValue({
       message: messageMock,
     } as never);
     mockUseTaskService.mockReturnValue({
@@ -52,25 +51,21 @@ describe("TaskBoard", () => {
       connectionStatus: "connected",
       reload,
       moveTask,
-      createTask: jest.fn(),
-      updateTaskById: jest.fn(),
-      deleteTask: jest.fn(),
+      createTask: vi.fn(),
+      updateTaskById: vi.fn(),
+      deleteTask: vi.fn(),
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("always renders the three columns", () => {
     renderBoard();
 
-    expect(
-      screen.getByTestId("task_board_stage_item_TODO")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByTestId("task_board_stage_item_IN_PROGRESS")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("task_board_stage_item_TODO")).toBeInTheDocument();
+    expect(screen.getByTestId("task_board_stage_item_IN_PROGRESS")).toBeInTheDocument();
     expect(screen.getByTestId("task_board_stage_item_DONE")).toBeInTheDocument();
     expect(screen.getAllByText("Drop tasks here")).toHaveLength(3);
   });
@@ -87,19 +82,15 @@ describe("TaskBoard", () => {
     renderBoard();
 
     expect(
-      within(screen.getByTestId("task_board_stage_item_TODO")).getByTestId(
-        "task_card_item_1"
-      )
+      within(screen.getByTestId("task_board_stage_item_TODO")).getByTestId("task_card_item_1"),
     ).toBeInTheDocument();
     expect(
-      within(
-        screen.getByTestId("task_board_stage_item_IN_PROGRESS")
-      ).getByTestId("task_card_item_2")
+      within(screen.getByTestId("task_board_stage_item_IN_PROGRESS")).getByTestId(
+        "task_card_item_2",
+      ),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByTestId("task_board_stage_item_DONE")).getByTestId(
-        "task_card_item_3"
-      )
+      within(screen.getByTestId("task_board_stage_item_DONE")).getByTestId("task_card_item_3"),
     ).toBeInTheDocument();
   });
 
@@ -111,17 +102,11 @@ describe("TaskBoard", () => {
     moveTask.mockResolvedValueOnce(undefined);
     renderBoard();
 
-    fireEvent.click(
-      screen.getByLabelText("Move Task 1 to next column")
-    );
+    fireEvent.click(screen.getByLabelText("Move Task 1 to next column"));
 
+    await waitFor(() => expect(moveTask).toHaveBeenCalledWith("1", TaskStatus.IN_PROGRESS, 0));
     await waitFor(() =>
-      expect(moveTask).toHaveBeenCalledWith("1", TaskStatus.IN_PROGRESS, 0)
-    );
-    await waitFor(() =>
-      expect(messageMock.success).toHaveBeenCalledWith(
-        "Task 1 moved to IN_PROGRESS"
-      )
+      expect(messageMock.success).toHaveBeenCalledWith("Task 1 moved to IN_PROGRESS"),
     );
   });
 

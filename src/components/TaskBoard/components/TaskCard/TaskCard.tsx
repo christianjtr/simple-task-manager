@@ -1,15 +1,14 @@
-import { useMemo, type DragEventHandler } from "react";
-import { Button, Card, Typography } from "antd";
 import {
   ArrowDownOutlined,
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons";
-
 import { OptimizedImage } from "@components/OptimizedImage/OptimizedImage";
 import type { Task } from "@src/types/task";
 import { formatDateForDisplay } from "@src/utils/formatDateForDisplay";
+import { Button, Card, Typography } from "antd";
+import { type DragEventHandler, useMemo } from "react";
 import styles from "./TaskCard.module.scss";
 
 const { Text } = Typography;
@@ -17,8 +16,11 @@ const { Text } = Typography;
 export type TaskMoveDirection = "up" | "down" | "previous" | "next";
 
 interface TaskCardProps extends Task {
-  onDragStart?: DragEventHandler<HTMLDivElement>;
-  onDragEnd?: DragEventHandler<HTMLDivElement>;
+  className?: string;
+  onDragStart?: DragEventHandler<HTMLLIElement>;
+  onDragEnd?: DragEventHandler<HTMLLIElement>;
+  onDragOver?: DragEventHandler<HTMLLIElement>;
+  onDrop?: DragEventHandler<HTMLLIElement>;
   onMove?: (direction: TaskMoveDirection) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -32,27 +34,29 @@ const TaskCard = ({
   description,
   updatedAt,
   image,
+  className,
   onDragStart,
   onDragEnd,
+  onDragOver,
+  onDrop,
   onMove,
   canMoveUp = false,
   canMoveDown = false,
   canMovePrevious = false,
   canMoveNext = false,
 }: TaskCardProps) => {
-  const updatedAtToDisplay = useMemo(
-    () => formatDateForDisplay(updatedAt),
-    [updatedAt]
-  );
+  const updatedAtToDisplay = useMemo(() => formatDateForDisplay(updatedAt), [updatedAt]);
 
   return (
-    <div
+    <li
       id={id}
       data-testid={`task_card_item_${id}`}
-      className={styles.cardWrapper}
+      className={`${styles.cardWrapper} ${className ?? ""}`}
       draggable={Boolean(onDragStart)}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
       <Card
         classNames={{ cover: styles.image }}
@@ -73,7 +77,8 @@ const TaskCard = ({
         {description}
       </Card>
       {onMove && (
-        <div className={styles.controls} role="group" aria-label={`Move ${title}`}>
+        <fieldset className={styles.controls}>
+          <legend className="sr-only">Move {title}</legend>
           <Button
             size="small"
             aria-label={`Move ${title} to previous column`}
@@ -106,9 +111,9 @@ const TaskCard = ({
             onClick={() => onMove("next")}
             icon={<ArrowRightOutlined />}
           />
-        </div>
+        </fieldset>
       )}
-    </div>
+    </li>
   );
 };
 

@@ -1,4 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { OptimizedImage } from "../OptimizedImage";
 
@@ -23,34 +24,27 @@ describe("OptimizedImage", () => {
   beforeEach(() => {
     FakeImage.instances = [];
     global.Image = FakeImage as unknown as typeof Image;
-    jest
-      .spyOn(document, "createElement")
-      .mockImplementation(((tagName: string) => {
-        if (tagName === "canvas") {
-          return {
-            width: 0,
-            height: 0,
-            getContext: () => ({ drawImage: jest.fn() }),
-            toDataURL: () => "data:image/jpeg;base64,optimized",
-          };
-        }
-        return originalCreateElement(tagName);
-      }) as typeof document.createElement);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) => {
+      if (tagName === "canvas") {
+        return {
+          width: 0,
+          height: 0,
+          getContext: () => ({ drawImage: vi.fn() }),
+          toDataURL: () => "data:image/jpeg;base64,optimized",
+        };
+      }
+      return originalCreateElement(tagName);
+    }) as typeof document.createElement);
   });
 
   afterEach(() => {
     global.Image = OriginalImage;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("optimizes the image and uses the generated source", async () => {
     render(
-      <OptimizedImage
-        src="https://example.com/ok.jpg"
-        alt="Task image"
-        width={400}
-        height={300}
-      />
+      <OptimizedImage src="https://example.com/ok.jpg" alt="Task image" width={400} height={300} />,
     );
 
     act(() => {
@@ -59,7 +53,7 @@ describe("OptimizedImage", () => {
 
     expect(await screen.findByAltText("Task image")).toHaveAttribute(
       "src",
-      "data:image/jpeg;base64,optimized"
+      "data:image/jpeg;base64,optimized",
     );
   });
 
@@ -70,7 +64,7 @@ describe("OptimizedImage", () => {
         alt="Broken image"
         width={400}
         height={300}
-      />
+      />,
     );
 
     act(() => {

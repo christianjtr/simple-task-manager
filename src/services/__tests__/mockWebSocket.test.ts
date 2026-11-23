@@ -1,4 +1,5 @@
 import { waitFor } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { mockApi } from "../mockApi";
 import { mockWebSocket, WebSocketEventType } from "../mockWebSocket";
@@ -16,9 +17,7 @@ describe("mockWebSocket", () => {
 
   it("exposes connection status transitions", async () => {
     const statuses: string[] = [];
-    const unsubscribe = mockWebSocket.subscribeStatus((status) =>
-      statuses.push(status)
-    );
+    const unsubscribe = mockWebSocket.subscribeStatus((status) => statuses.push(status));
 
     await mockWebSocket.connect();
     expect(mockWebSocket.getStatus()).toBe("connected");
@@ -39,7 +38,7 @@ describe("mockWebSocket", () => {
   });
 
   it("delivers messages to subscribers and removes them on unsubscribe", async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const unsubscribe = mockWebSocket.subscribe(handler);
     await mockWebSocket.connect();
 
@@ -53,7 +52,7 @@ describe("mockWebSocket", () => {
   });
 
   it("ignores sends while disconnected", () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     mockWebSocket.send(updateMessage);
     expect(warn).toHaveBeenCalledWith("WebSocket is not connected");
     warn.mockRestore();

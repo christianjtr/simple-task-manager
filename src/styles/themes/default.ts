@@ -1,5 +1,5 @@
 import { setTwoToneColor } from "@ant-design/icons";
-import { ThemeConfig } from "antd";
+import type { ThemeConfig } from "antd";
 
 const BRAND_COLOR = "#0284c7";
 const WHITE_COLOR = "#ffffff";

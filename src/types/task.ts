@@ -35,11 +35,7 @@ export interface TaskMove {
   index: number;
 }
 
-export type ConnectionStatus =
-  | "disconnected"
-  | "connecting"
-  | "connected"
-  | "reconnecting";
+export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
 export function isTask(value: unknown): value is Task {
   if (typeof value !== "object" || value === null) return false;
@@ -59,11 +55,9 @@ export function isTaskUpdate(value: unknown): value is TaskUpdate {
   const candidate = value as Partial<TaskUpdate>;
   return (
     typeof candidate.id === "string" &&
-    (candidate.status === undefined ||
-      Object.values(TaskStatus).includes(candidate.status)) &&
+    (candidate.status === undefined || Object.values(TaskStatus).includes(candidate.status)) &&
     (candidate.title === undefined || typeof candidate.title === "string") &&
-    (candidate.description === undefined ||
-      typeof candidate.description === "string")
+    (candidate.description === undefined || typeof candidate.description === "string")
   );
 }
 

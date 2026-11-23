@@ -1,3 +1,4 @@
+import { type Task, TaskStatus } from "../../types/task";
 import reducer, {
   addTask,
   moveTask,
@@ -6,10 +7,9 @@ import reducer, {
   setError,
   setLoading,
   setTasks,
-  updateTask,
   type TaskState,
+  updateTask,
 } from "../taskSlice";
-import { TaskStatus, type Task } from "../../types/task";
 
 const makeTask = (id: string, status: TaskStatus): Task => ({
   id,
@@ -43,10 +43,7 @@ describe("taskSlice", () => {
   });
 
   it("moves a task to another column at the requested index", () => {
-    const next = reducer(
-      state,
-      moveTask({ taskId: "1", status: TaskStatus.TODO, index: 2 })
-    );
+    const next = reducer(state, moveTask({ taskId: "1", status: TaskStatus.TODO, index: 2 }));
     expect(next.tasks.filter((task) => task.status === TaskStatus.TODO)).toEqual([
       expect.objectContaining({ id: "2" }),
       expect.objectContaining({ id: "1" }),
@@ -56,7 +53,7 @@ describe("taskSlice", () => {
   it("keeps an empty column renderable by inserting into it", () => {
     const next = reducer(
       { ...state, tasks: [makeTask("1", TaskStatus.TODO)] },
-      moveTask({ taskId: "1", status: TaskStatus.IN_PROGRESS, index: 0 })
+      moveTask({ taskId: "1", status: TaskStatus.IN_PROGRESS, index: 0 }),
     );
     expect(next.tasks[0]).toMatchObject({
       id: "1",
@@ -65,13 +62,11 @@ describe("taskSlice", () => {
   });
 
   it("applies an ordered list coming from the realtime channel", () => {
-    const next = reducer(
-      state,
-      reorderTasks({ status: TaskStatus.TODO, ids: ["2", "1"] })
-    );
-    expect(
-      next.tasks.filter((task) => task.status === TaskStatus.TODO).map((t) => t.id)
-    ).toEqual(["2", "1"]);
+    const next = reducer(state, reorderTasks({ status: TaskStatus.TODO, ids: ["2", "1"] }));
+    expect(next.tasks.filter((task) => task.status === TaskStatus.TODO).map((t) => t.id)).toEqual([
+      "2",
+      "1",
+    ]);
   });
 
   it("adds, removes and tracks loading/error state", () => {

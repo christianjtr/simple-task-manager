@@ -1,19 +1,14 @@
-import { useCallback, useEffect } from "react";
-
-import type { ConnectionStatus, Task, TaskStatus } from "@src/types/task";
-import {
-  isTask,
-  isTaskOrderPayload,
-  isTaskUpdate,
-} from "@src/types/task";
 import { mockApi } from "@src/services/mockApi";
 import {
   mockWebSocket,
   WebSocketEventType,
   type WebSocketMessage,
 } from "@src/services/mockWebSocket";
-import { useAppDispatch, useAppSelector, useAppStore } from "./useReduxStore";
+import type { ConnectionStatus, Task, TaskStatus } from "@src/types/task";
+import { isTask, isTaskOrderPayload, isTaskUpdate } from "@src/types/task";
+import { useCallback, useEffect } from "react";
 import * as store from "../store/taskSlice";
+import { useAppDispatch, useAppSelector, useAppStore } from "./useReduxStore";
 
 interface UseTaskService {
   tasks: Task[];
@@ -24,11 +19,7 @@ interface UseTaskService {
   createTask: (task: Task) => Promise<void>;
   updateTaskById: (taskId: Task["id"], task: Partial<Task>) => Promise<void>;
   deleteTask: (task: Task["id"]) => Promise<void>;
-  moveTask: (
-    taskId: Task["id"],
-    status: TaskStatus,
-    index: number
-  ) => Promise<void>;
+  moveTask: (taskId: Task["id"], status: TaskStatus, index: number) => Promise<void>;
 }
 
 const toErrorMessage = (error: unknown): string =>
@@ -41,9 +32,7 @@ const useTaskService = (): UseTaskService => {
   const tasks = useAppSelector((state) => state.tasks.tasks);
   const isLoading = useAppSelector((state) => state.tasks.isLoading);
   const error = useAppSelector((state) => state.tasks.error);
-  const connectionStatus = useAppSelector(
-    (state) => state.tasks.connectionStatus
-  );
+  const connectionStatus = useAppSelector((state) => state.tasks.connectionStatus);
 
   const handleMessage = useCallback(
     (message: WebSocketMessage) => {
@@ -70,7 +59,7 @@ const useTaskService = (): UseTaskService => {
           break;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const reload = useCallback(async (): Promise<void> => {
@@ -129,21 +118,19 @@ const useTaskService = (): UseTaskService => {
         throw caught;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const updateTaskById = useCallback(
     async (taskId: Task["id"], task: Partial<Task>): Promise<void> => {
       try {
-        dispatch(
-          store.updateTask(await mockApi.updateTask(taskId, { ...task, id: taskId }))
-        );
+        dispatch(store.updateTask(await mockApi.updateTask(taskId, { ...task, id: taskId })));
       } catch (caught) {
         dispatch(store.setError(toErrorMessage(caught)));
         throw caught;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const deleteTask = useCallback(
@@ -156,15 +143,11 @@ const useTaskService = (): UseTaskService => {
         throw caught;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const moveTask = useCallback(
-    async (
-      taskId: Task["id"],
-      status: TaskStatus,
-      index: number
-    ): Promise<void> => {
+    async (taskId: Task["id"], status: TaskStatus, index: number): Promise<void> => {
       const previous = appStore.getState().tasks.tasks;
       const task = previous.find((item) => item.id === taskId);
       dispatch(store.moveTask({ taskId, status, index }));
@@ -186,7 +169,7 @@ const useTaskService = (): UseTaskService => {
         throw caught;
       }
     },
-    [appStore, dispatch]
+    [appStore, dispatch],
   );
 
   return {

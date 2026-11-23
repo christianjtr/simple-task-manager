@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Layout } from "antd";
-
+import { useState } from "react";
+import styles from "./App.module.scss";
 import { Header } from "./components/Header/Header";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { TaskBoard } from "./components/TaskBoard/TaskBoard";
-import styles from "./App.module.scss";
 
 const { Content } = Layout;
 

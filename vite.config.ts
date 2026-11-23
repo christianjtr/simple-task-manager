@@ -1,15 +1,14 @@
-import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@styles": "/src/styles",
+      "@components": "/src/components",
       "@src": "/src",
-      "@modules": "/src/modules",
     },
   },
 });

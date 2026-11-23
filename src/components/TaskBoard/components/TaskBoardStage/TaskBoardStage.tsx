@@ -1,7 +1,6 @@
-import { useState, type DragEvent } from "react";
+import type { Task, TaskStatus } from "@src/types/task";
 import { Empty, Typography } from "antd";
-
-import { TaskStatus, type Task } from "@src/types/task";
+import { type DragEvent, useState } from "react";
 import { STAGE_ORDER } from "../../stages";
 import { TaskCard, type TaskMoveDirection } from "../TaskCard/TaskCard";
 import styles from "./TaskBoardStage.module.scss";
@@ -16,13 +15,7 @@ interface TaskBoardStageProps {
 
 const { Title } = Typography;
 
-const TaskBoardStage = ({
-  id,
-  title,
-  status,
-  tasks,
-  onMoveTask,
-}: TaskBoardStageProps) => {
+const TaskBoardStage = ({ id, title, status, tasks, onMoveTask }: TaskBoardStageProps) => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const stagePosition = STAGE_ORDER.indexOf(status);
@@ -49,8 +42,7 @@ const TaskBoardStage = ({
       return;
     }
 
-    const nextPosition =
-      stagePosition + (direction === "next" ? 1 : -1);
+    const nextPosition = stagePosition + (direction === "next" ? 1 : -1);
     const nextStatus = STAGE_ORDER[nextPosition];
     if (nextStatus) void onMoveTask?.(taskId, nextStatus, 0);
   };
@@ -66,15 +58,16 @@ const TaskBoardStage = ({
       <Title level={4} className={styles.title}>
         {title}
       </Title>
-      <div className={styles.count} aria-label={`${tasks.length} tasks`}>
-        {tasks.length}
-      </div>
-      <div className={styles.list}>
+      <span className={styles.count}>{tasks.length}</span>
+      <ul className={styles.list}>
         {tasks.length === 0 && (
-          <Empty description="Drop tasks here" className={styles.empty} />
+          <li>
+            <Empty description="Drop tasks here" className={styles.empty} />
+          </li>
         )}
         {tasks.map((task, index) => (
-          <div
+          <TaskCard
+            {...task}
             key={task.id}
             className={`${styles.cardSlot} ${
               dropIndex === index && draggedId ? styles.dropTarget : ""
@@ -84,27 +77,23 @@ const TaskBoardStage = ({
               setDropIndex(index);
             }}
             onDrop={(event) => handleDrop(index, event)}
-          >
-            <TaskCard
-              {...task}
-              onDragStart={(event) => {
-                event.dataTransfer.setData("text/plain", task.id);
-                event.dataTransfer.effectAllowed = "move";
-                setDraggedId(task.id);
-              }}
-              onDragEnd={() => {
-                setDraggedId(null);
-                setDropIndex(null);
-              }}
-              onMove={(direction) => handleMove(task.id, direction)}
-              canMoveUp={index > 0}
-              canMoveDown={index < tasks.length - 1}
-              canMovePrevious={stagePosition > 0}
-              canMoveNext={stagePosition < STAGE_ORDER.length - 1}
-            />
-          </div>
+            onDragStart={(event) => {
+              event.dataTransfer.setData("text/plain", task.id);
+              event.dataTransfer.effectAllowed = "move";
+              setDraggedId(task.id);
+            }}
+            onDragEnd={() => {
+              setDraggedId(null);
+              setDropIndex(null);
+            }}
+            onMove={(direction) => handleMove(task.id, direction)}
+            canMoveUp={index > 0}
+            canMoveDown={index < tasks.length - 1}
+            canMovePrevious={stagePosition > 0}
+            canMoveNext={stagePosition < STAGE_ORDER.length - 1}
+          />
         ))}
-      </div>
+      </ul>
     </section>
   );
 };

@@ -1,5 +1,5 @@
-import { mockApi, MOCK_TASK_COUNT } from "../mockApi";
 import { TaskStatus } from "../../types/task";
+import { MOCK_TASK_COUNT, mockApi } from "../mockApi";
 
 describe("mockApi", () => {
   beforeEach(() => mockApi.reset());
@@ -17,7 +17,7 @@ describe("mockApi", () => {
         status: expect.any(String),
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
-      })
+      }),
     );
     expect(Object.values(TaskStatus)).toContain(tasks[0].status);
   });
@@ -40,17 +40,15 @@ describe("mockApi", () => {
       status: target.status,
     });
     expect(new Date(updated.updatedAt).getTime()).toBeGreaterThanOrEqual(
-      new Date(target.updatedAt).getTime()
+      new Date(target.updatedAt).getTime(),
     );
   });
 
   it("fails immediately for a permanently missing task", async () => {
-    await expect(
-      mockApi.updateTask("missing", { id: "missing", title: "x" })
-    ).rejects.toThrow("Task missing not found");
-    await expect(mockApi.deleteTask("missing")).rejects.toThrow(
-      "Task missing not found"
+    await expect(mockApi.updateTask("missing", { id: "missing", title: "x" })).rejects.toThrow(
+      "Task missing not found",
     );
+    await expect(mockApi.deleteTask("missing")).rejects.toThrow("Task missing not found");
   });
 
   it("reorders a column and reports the new order", async () => {
@@ -64,9 +62,7 @@ describe("mockApi", () => {
     expect(reordered.map((task) => task.id)).toEqual(ids);
 
     const after = await mockApi.getTasks();
-    expect(
-      after.filter((task) => task.status === TaskStatus.TODO).map((t) => t.id)
-    ).toEqual(ids);
+    expect(after.filter((task) => task.status === TaskStatus.TODO).map((t) => t.id)).toEqual(ids);
   });
 
   it("creates and deletes a task", async () => {

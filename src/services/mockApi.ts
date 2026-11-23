@@ -37,13 +37,12 @@ export class TransientApiError extends Error {
   }
 }
 
-const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function performRequestWithRetry<T>(
   fn: () => Promise<T>,
   maxAttempts = 3,
-  retryDelay = 1000
+  retryDelay = 1000,
 ): Promise<T> {
   let attempt = 0;
 
@@ -61,11 +60,7 @@ async function performRequestWithRetry<T>(
 }
 
 const generateMockTasks = (count: number): Task[] => {
-  const statuses = [
-    TaskStatus.TODO,
-    TaskStatus.IN_PROGRESS,
-    TaskStatus.DONE,
-  ];
+  const statuses = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
   const tasks: Task[] = [];
 
   for (let i = 0; i < count; i += 1) {
@@ -167,12 +162,12 @@ export const mockApi = {
     const reordered = ids
       .map((id) => taskStore.get(id))
       .filter((task): task is Task => Boolean(task && task.status === status));
-    const untouched = Array.from(taskStore.values()).filter(
-      (task) => !ids.includes(task.id)
-    );
+    const untouched = Array.from(taskStore.values()).filter((task) => !ids.includes(task.id));
     const nextTasks = [...untouched, ...reordered];
     taskStore.clear();
-    nextTasks.forEach((task) => taskStore.set(task.id, task));
+    nextTasks.forEach((task) => {
+      taskStore.set(task.id, task);
+    });
     return reordered;
   },
 

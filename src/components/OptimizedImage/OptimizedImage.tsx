@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { Image as AntImage, Skeleton } from "antd";
+import { useEffect, useState } from "react";
 import styles from "./OptimizedImage.module.scss";
 
 interface OptimizedImageProps {
@@ -19,7 +19,7 @@ const processImage = (
   width: number,
   height: number,
   quality: number,
-  isCancelled: () => boolean
+  isCancelled: () => boolean,
 ): Promise<string> =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -29,11 +29,7 @@ const processImage = (
       if (isCancelled()) return;
 
       try {
-        const scale = Math.min(
-          1,
-          width / img.naturalWidth,
-          height / img.naturalHeight
-        );
+        const scale = Math.min(1, width / img.naturalWidth, height / img.naturalHeight);
         const canvas = document.createElement("canvas");
         canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
         canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
@@ -65,7 +61,7 @@ export const OptimizedImage = ({
   const displayHeight = Math.max(1, Math.round((displayWidth * height) / width));
   const cacheKey = `${src}|${displayWidth}|${displayHeight}|${quality}`;
   const [processedSrc, setProcessedSrc] = useState<string | null>(
-    () => cache.get(cacheKey) ?? null
+    () => cache.get(cacheKey) ?? null,
   );
   const [loading, setLoading] = useState(() => !cache.has(cacheKey));
   const [error, setError] = useState<string | null>(null);
@@ -83,13 +79,7 @@ export const OptimizedImage = ({
 
     setLoading(true);
     setError(null);
-    void processImage(
-      src,
-      displayWidth,
-      displayHeight,
-      quality,
-      () => cancelled
-    )
+    void processImage(src, displayWidth, displayHeight, quality, () => cancelled)
       .then((data) => {
         if (cancelled) return;
         cache.set(cacheKey, data);
@@ -123,10 +113,7 @@ export const OptimizedImage = ({
   }
 
   return (
-    <div
-      className={`${styles.container} ${className ?? ""}`}
-      style={dimensions}
-    >
+    <div className={`${styles.container} ${className ?? ""}`} style={dimensions}>
       {loading ? (
         <Skeleton.Image active style={dimensions} />
       ) : (

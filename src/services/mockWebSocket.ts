@@ -1,18 +1,14 @@
-import type {
-  ConnectionStatus,
-  TaskOrderPayload,
-  TaskUpdate,
-} from "@src/types/task";
+import type { ConnectionStatus, TaskOrderPayload, TaskUpdate } from "@src/types/task";
 import { mockApi } from "./mockApi";
 import {
+  type MessageHandler,
   taskEventBus,
   WebSocketEventType,
-  type MessageHandler,
   type WebSocketMessage,
 } from "./taskEvents";
 
-export { WebSocketEventType };
 export type { MessageHandler, WebSocketMessage };
+export { WebSocketEventType };
 
 type Timer = ReturnType<typeof setTimeout>;
 
@@ -32,8 +28,7 @@ class MockWebSocket {
 
   getStatus = (): ConnectionStatus => this.status;
 
-  subscribe = (handler: MessageHandler): (() => void) =>
-    taskEventBus.subscribe(handler);
+  subscribe = (handler: MessageHandler): (() => void) => taskEventBus.subscribe(handler);
 
   subscribeStatus = (handler: (status: ConnectionStatus) => void): (() => void) => {
     this.statusHandlers.add(handler);
@@ -46,9 +41,7 @@ class MockWebSocket {
     if (this.connectPromise) return this.connectPromise;
     if (this.status === "connected") return Promise.resolve();
 
-    this.setStatus(
-      this.reconnectAttempts > 0 ? "reconnecting" : "connecting"
-    );
+    this.setStatus(this.reconnectAttempts > 0 ? "reconnecting" : "connecting");
 
     this.connectPromise = new Promise<void>((resolve) => {
       let canceled = false;
@@ -85,7 +78,9 @@ class MockWebSocket {
     this.simulationInterval = null;
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.reconnectTimer = null;
-    this.pendingSends.forEach((timer) => clearTimeout(timer));
+    this.pendingSends.forEach((timer) => {
+      clearTimeout(timer);
+    });
     this.pendingSends.clear();
     this.setStatus("disconnected");
   }
@@ -141,7 +136,9 @@ class MockWebSocket {
   private setStatus(status: ConnectionStatus): void {
     if (this.status === status) return;
     this.status = status;
-    this.statusHandlers.forEach((handler) => handler(status));
+    this.statusHandlers.forEach((handler) => {
+      handler(status);
+    });
   }
 
   private startSimulation(): void {

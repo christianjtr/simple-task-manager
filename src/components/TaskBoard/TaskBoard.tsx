@@ -1,10 +1,9 @@
-import { useMemo } from "react";
-import { Alert, App as AntApp, Button, Col, Row, Spin } from "antd";
-
 import { useTaskService } from "@src/hooks/useTaskService";
 import type { TaskStatus } from "@src/types/task";
-import { DEFAULT_STAGES } from "./stages";
+import { Alert, App as AntApp, Button, Col, Row, Spin } from "antd";
+import { useMemo } from "react";
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
+import { DEFAULT_STAGES } from "./stages";
 
 const TaskBoard = () => {
   const { message } = AntApp.useApp();
@@ -16,22 +15,16 @@ const TaskBoard = () => {
         ...stage,
         tasks: tasks.filter((task) => task.status === stage.status),
       })),
-    [tasks]
+    [tasks],
   );
 
-  const handleMove = async (
-    taskId: string,
-    status: TaskStatus,
-    index: number
-  ): Promise<void> => {
+  const handleMove = async (taskId: string, status: TaskStatus, index: number): Promise<void> => {
     try {
       await moveTask(taskId, status, index);
       message.success(`Task ${taskId} moved to ${status}`);
     } catch (caught) {
       message.error(
-        `Cannot move task ${taskId}: ${
-          caught instanceof Error ? caught.message : String(caught)
-        }`
+        `Cannot move task ${taskId}: ${caught instanceof Error ? caught.message : String(caught)}`,
       );
     }
   };

@@ -1,8 +1,7 @@
-import { Avatar, Badge, Layout, Space, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-
 import { useAppSelector } from "@src/hooks/useReduxStore";
 import type { ConnectionStatus } from "@src/types/task";
+import { Avatar, Badge, Layout, Space, Typography } from "antd";
 import styles from "./Header.module.scss";
 
 const { Header: AntHeader } = Layout;
@@ -22,12 +21,8 @@ const STATUS_BADGE: Record<
   disconnected: { status: "error", text: "Offline" },
 };
 
-export const Header: React.FC<HeaderProps> = ({
-  title = "Task Management System",
-}) => {
-  const connectionStatus = useAppSelector(
-    (state) => state.tasks.connectionStatus
-  );
+export const Header: React.FC<HeaderProps> = ({ title = "Task Management System" }) => {
+  const connectionStatus = useAppSelector((state) => state.tasks.connectionStatus);
   const badge = STATUS_BADGE[connectionStatus];
 
   return (

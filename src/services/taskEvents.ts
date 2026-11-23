@@ -1,8 +1,4 @@
-import type {
-  Task,
-  TaskOrderPayload,
-  TaskUpdate,
-} from "@src/types/task";
+import type { Task, TaskOrderPayload, TaskUpdate } from "@src/types/task";
 
 export enum WebSocketEventType {
   TASK_UPDATE = "TASK_UPDATE",
@@ -30,7 +26,9 @@ class TaskEventBus {
   }
 
   publish(message: WebSocketMessage): void {
-    [...this.handlers].forEach((handler) => handler(message));
+    [...this.handlers].forEach((handler) => {
+      handler(message);
+    });
   }
 
   clear(): void {

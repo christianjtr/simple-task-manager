@@ -1,11 +1,11 @@
-import { Layout, Menu } from "antd";
 import {
+  AppstoreOutlined,
   DashboardOutlined,
   ProjectOutlined,
-  TeamOutlined,
   SettingOutlined,
-  AppstoreOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
+import { Layout, Menu } from "antd";
 import styles from "./Sidebar.module.scss";
 
 const { Sider } = Layout;
@@ -15,10 +15,7 @@ interface SidebarProps {
   onCollapse?: (collapsed: boolean) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  collapsed = false,
-  onCollapse,
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onCollapse }) => {
   const menuItems = [
     {
       key: "dashboard",
@@ -51,17 +48,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       theme="light"
     >
       <div className={styles.logo}>
-        {collapsed ? (
-          <AppstoreOutlined className={styles.logoIcon} />
-        ) : (
-          <span>TaskManager</span>
-        )}
+        {collapsed ? <AppstoreOutlined className={styles.logoIcon} /> : <span>TaskManager</span>}
       </div>
-      <Menu
-        mode="inline"
-        defaultSelectedKeys={["dashboard"]}
-        items={menuItems}
-      />
+      <Menu mode="inline" defaultSelectedKeys={["dashboard"]} items={menuItems} />
     </Sider>
   );
 };

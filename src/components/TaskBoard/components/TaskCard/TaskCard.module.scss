@@ -12,7 +12,6 @@
 .taskCard {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
@@ -22,10 +21,7 @@
   }
 
   &:active {
-    background-color: color.adjust(
-      $interaction-color-action,
-      $lightness: 50%
-    );
+    background-color: color.adjust($interaction-color-action, $lightness: 50%);
   }
 }
 
@@ -33,11 +29,13 @@
   width: 100%;
 
   * {
-    width: inherit !important;
+    width: inherit;
   }
 }
 
 .controls {
+  border: 0;
+  padding: 0;
   display: flex;
   gap: $spacing-xs;
   justify-content: flex-end;

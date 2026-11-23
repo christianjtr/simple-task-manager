@@ -1,10 +1,6 @@
 import { TaskStatus } from "@src/types/task";
 
-export const STAGE_ORDER: TaskStatus[] = [
-  TaskStatus.TODO,
-  TaskStatus.IN_PROGRESS,
-  TaskStatus.DONE,
-];
+export const STAGE_ORDER: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
 
 export const DEFAULT_STAGES: {
   id: TaskStatus;
