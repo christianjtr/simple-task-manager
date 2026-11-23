@@ -3,6 +3,7 @@ import { exportBackup, type ImportResult } from "@src/features/tasks/task.import
 import { importBackupIntoDb } from "@src/features/tasks/task.repository";
 import { useProjects } from "@src/hooks/useProjects";
 import { useTasks } from "@src/hooks/useTasks";
+import { t } from "@src/i18n/en";
 import { App as AntApp, Button, Dropdown, Modal, Typography } from "antd";
 import { type ChangeEvent, useRef, useState } from "react";
 
@@ -22,12 +23,12 @@ export const BackupActions = () => {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `simple-task-manager-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = `tasklane-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
-    message.success("Respaldo exportado");
+    message.success(t("backup.exportSuccess"));
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -39,9 +40,9 @@ export const BackupActions = () => {
       const value: unknown = JSON.parse(await file.text());
       const result = await importBackupIntoDb(value);
       setImportResult(result);
-      message.success("Respaldo importado");
+      message.success(t("backup.importSuccess"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo importar el respaldo");
+      message.error(caught instanceof Error ? caught.message : t("backup.importFailed"));
     } finally {
       event.target.value = "";
       setIsImporting(false);
@@ -57,21 +58,21 @@ export const BackupActions = () => {
             {
               key: "export",
               icon: <ExportOutlined />,
-              label: "Exportar JSON",
+              label: t("backup.exportJson"),
               onClick: handleExport,
             },
             {
               key: "import",
               icon: <ImportOutlined />,
-              label: isImporting ? "Importando..." : "Importar JSON",
+              label: isImporting ? t("backup.importing") : t("backup.importJson"),
               disabled: isImporting,
               onClick: () => fileInputRef.current?.click(),
             },
           ],
         }}
       >
-        <Button icon={<DatabaseOutlined />} aria-label="Datos">
-          Datos
+        <Button icon={<DatabaseOutlined />} aria-label={t("backup.data")}>
+          {t("backup.data")}
         </Button>
       </Dropdown>
 
@@ -80,29 +81,31 @@ export const BackupActions = () => {
         type="file"
         accept="application/json,.json"
         className="hidden"
-        aria-label="Archivo de respaldo"
+        aria-label={t("backup.fileAria")}
         onChange={(event) => void handleFileChange(event)}
       />
 
       <Modal
-        title="Importación completada"
+        title={t("backup.importComplete")}
         open={Boolean(importResult)}
         onCancel={() => setImportResult(null)}
         footer={
           <Button type="primary" onClick={() => setImportResult(null)}>
-            Cerrar
+            {t("backup.close")}
           </Button>
         }
       >
         <Paragraph>
-          Proyectos importados: <Text strong>{importResult?.importedProjects ?? 0}</Text>
+          {t("backup.importedProjects")} <Text strong>{importResult?.importedProjects ?? 0}</Text>
         </Paragraph>
         <Paragraph>
-          Tareas importadas: <Text strong>{importResult?.importedTasks ?? 0}</Text>
+          {t("backup.importedTasks")} <Text strong>{importResult?.importedTasks ?? 0}</Text>
         </Paragraph>
         <Paragraph type="secondary">
-          Omitidos: {importResult?.skippedProjects ?? 0} proyectos,{" "}
-          {importResult?.skippedTasks ?? 0} tareas
+          {t("backup.skipped", {
+            projects: importResult?.skippedProjects ?? 0,
+            tasks: importResult?.skippedTasks ?? 0,
+          })}
         </Paragraph>
       </Modal>
     </>

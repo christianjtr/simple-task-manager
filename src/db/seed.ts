@@ -1,40 +1,41 @@
 import { db } from "@src/db/database";
 
 import { type Project, type Task, TaskStatus } from "@src/features/tasks/task.types";
+import { t } from "@src/i18n/en";
 
 export async function loadExampleData(): Promise<void> {
   const projectId = "project_example";
   const now = new Date();
   const project: Project = {
     id: projectId,
-    name: "Proyecto de ejemplo",
+    name: t("seed.projectName"),
     color: "#6366f1",
-    description: "Proyecto inicial para explorar el tablero.",
+    description: t("seed.projectDescription"),
     createdAt: now,
     updatedAt: now,
   };
 
   const examples: Array<Pick<Task, "title" | "description" | "status" | "priority" | "tags">> = [
     {
-      title: "Definir alcance",
-      description: "Escribir los objetivos del proyecto.",
+      title: t("seed.task1Title"),
+      description: t("seed.task1Description"),
       status: TaskStatus.TODO,
       priority: "high",
-      tags: ["planificación"],
+      tags: [t("seed.task1Tag")],
     },
     {
-      title: "Diseñar tablero",
-      description: "Bocetar las columnas y el diseño de tarjeta.",
+      title: t("seed.task2Title"),
+      description: t("seed.task2Description"),
       status: TaskStatus.IN_PROGRESS,
       priority: "medium",
-      tags: ["diseño"],
+      tags: [t("seed.task2Tag")],
     },
     {
-      title: "Preparar entorno",
-      description: "Instalar dependencias y configurar el repositorio.",
+      title: t("seed.task3Title"),
+      description: t("seed.task3Description"),
       status: TaskStatus.DONE,
       priority: "low",
-      tags: ["setup"],
+      tags: [t("seed.task3Tag")],
     },
   ];
 

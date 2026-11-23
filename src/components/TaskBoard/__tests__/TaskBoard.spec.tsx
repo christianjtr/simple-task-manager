@@ -122,15 +122,15 @@ describe("TaskBoard", () => {
     mockCreateTask.mockResolvedValue(task("4", TaskStatus.TODO));
     renderBoard();
 
-    fireEvent.click(screen.getByRole("button", { name: /Nueva tarea/ }));
-    fireEvent.change(screen.getByPlaceholderText("Ej. Preparar reunión"), {
-      target: { value: "Nueva tarea" },
+    fireEvent.click(screen.getByRole("button", { name: /New task/ }));
+    fireEvent.change(screen.getByPlaceholderText("E.g. Prepare meeting"), {
+      target: { value: "New task" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /Crear tarea/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Create task/ }));
 
     await waitFor(() =>
       expect(mockCreateTask).toHaveBeenCalledWith(
-        expect.objectContaining({ projectId: "project_1", title: "Nueva tarea" }),
+        expect.objectContaining({ projectId: "project_1", title: "New task" }),
       ),
     );
   });
@@ -145,7 +145,7 @@ describe("TaskBoard", () => {
     });
     renderBoard();
 
-    fireEvent.change(screen.getByPlaceholderText("Buscar tareas..."), {
+    fireEvent.change(screen.getByPlaceholderText("Search tasks..."), {
       target: { value: "diseño" },
     });
 

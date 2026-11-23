@@ -1,5 +1,6 @@
 import { ClearOutlined, SearchOutlined } from "@ant-design/icons";
 import type { TaskPriority } from "@src/features/tasks/task.types";
+import { t } from "@src/i18n/en";
 import { Button, Input, Select, Space } from "antd";
 
 const { Option } = Select;
@@ -29,28 +30,28 @@ export const TaskFiltersBar = ({
     <Input.Search
       allowClear
       prefix={<SearchOutlined />}
-      placeholder="Buscar tareas..."
-      aria-label="Buscar tareas"
+      placeholder={t("filters.searchPlaceholder")}
+      aria-label={t("filters.searchAria")}
       value={search}
       onChange={(event) => onSearch(event.target.value)}
       className="w-full sm:w-64"
     />
     <Select<TaskPriority>
       allowClear
-      placeholder="Prioridad"
-      aria-label="Filtrar por prioridad"
+      placeholder={t("filters.priorityPlaceholder")}
+      aria-label={t("filters.priorityAria")}
       value={priority}
       onChange={onPriority}
       className="w-36"
     >
-      <Option value="low">Baja</Option>
-      <Option value="medium">Media</Option>
-      <Option value="high">Alta</Option>
+      <Option value="low">{t("priority.low")}</Option>
+      <Option value="medium">{t("priority.medium")}</Option>
+      <Option value="high">{t("priority.high")}</Option>
     </Select>
     <Select<string>
       allowClear
-      placeholder="Tag"
-      aria-label="Filtrar por tag"
+      placeholder={t("filters.tagPlaceholder")}
+      aria-label={t("filters.tagAria")}
       value={tag}
       onChange={onTag}
       className="w-36"
@@ -62,7 +63,7 @@ export const TaskFiltersBar = ({
       ))}
     </Select>
     <Button icon={<ClearOutlined />} onClick={onClear} disabled={!search && !priority && !tag}>
-      Limpiar
+      {t("filters.clear")}
     </Button>
   </Space>
 );

@@ -27,7 +27,9 @@ export function nextPosition(tasks: Task[], status: TaskStatus): number {
 
 export function formatDueDate(date?: Date): string {
   if (!date) return "";
-  return DateTime.fromJSDate(date, { zone: "utc" }).toLocaleString(DateTime.DATE_MED);
+  return DateTime.fromJSDate(date, { zone: "utc" })
+    .setLocale("en")
+    .toLocaleString(DateTime.DATE_MED);
 }
 
 export function toIsoString(date: Date): string {

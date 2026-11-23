@@ -5,8 +5,10 @@ import { TaskBoard } from "@src/components/TaskBoard/TaskBoard";
 import { loadExampleData } from "@src/db/seed";
 import { useActiveProject } from "@src/hooks/useActiveProject";
 import { type ThemeMode, useTheme } from "@src/hooks/useTheme";
+import { t } from "@src/i18n/en";
 import { getThemeConfig } from "@styles/themes/default";
 import { App as AntApp, ConfigProvider, Layout, Skeleton } from "antd";
+import enUS from "antd/locale/en_US";
 import { useState } from "react";
 
 const { Content, Sider } = Layout;
@@ -26,9 +28,9 @@ const AppShell = ({ theme, onToggleTheme }: AppShellProps) => {
     setIsSeeding(true);
     try {
       await loadExampleData();
-      message.success("Proyecto de ejemplo cargado");
+      message.success(t("app.exampleLoaded"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo cargar el ejemplo");
+      message.error(caught instanceof Error ? caught.message : t("app.exampleLoadFailed"));
     } finally {
       setIsSeeding(false);
     }
@@ -87,7 +89,7 @@ const App = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <ConfigProvider theme={getThemeConfig(theme)}>
+    <ConfigProvider locale={enUS} theme={getThemeConfig(theme)}>
       <AntApp>
         <AppShell theme={theme} onToggleTheme={toggleTheme} />
       </AntApp>

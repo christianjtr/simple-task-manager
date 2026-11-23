@@ -140,17 +140,17 @@ The repository was later modernized from the original mock real-time challenge i
 
 ### Requirement mapping
 
-| Original requirement | Modernized outcome |
-| --- | --- |
-| Three-column board | `TaskBoard` keeps To Do, In Progress, and Done mounted as droppable stages. |
-| 50-100 mock tasks | Optional example data is seeded into IndexedDB; the app starts with an empty state. |
-| Mock realtime WebSocket | Removed. `useLiveQuery` reacts to local Dexie writes. |
-| Redux state | Removed. Hooks and the task repository own reads and mutations. |
-| Native drag-and-drop | Replaced by dnd-kit with `DragOverlay` and keyboard announcements. |
-| `OptimizedImage` | Removed; cards focus on title, description, priority, due date, and tags. |
-| API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI. |
-| Unit and integration tests | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test. |
-| Type-checked production build | `pnpm build` runs `tsc -b` before Vite. |
+| Original requirement            | Modernized outcome                                                                  |
+| ------------------------------- | ----------------------------------------------------------------------------------- |
+| Three-column board              | `TaskBoard` keeps To Do, In Progress, and Done mounted as droppable stages.         |
+| 50-100 mock tasks               | Optional example data is seeded into IndexedDB; the app starts with an empty state. |
+| Mock realtime WebSocket         | Removed. `useLiveQuery` reacts to local Dexie writes.                               |
+| Redux state                     | Removed. Hooks and the task repository own reads and mutations.                     |
+| Native drag-and-drop            | Replaced by dnd-kit with `DragOverlay` and keyboard announcements.                  |
+| `OptimizedImage`                | Removed; cards focus on title, description, priority, due date, and tags.           |
+| API errors and reconnect states | Not applicable without a network service. Import errors are surfaced in the UI.     |
+| Unit and integration tests      | Vitest + Testing Library + fake-indexeddb, plus a Playwright smoke test.            |
+| Type-checked production build   | `pnpm build` runs `tsc -b` before Vite.                                             |
 
 ### Review stages
 
@@ -164,4 +164,3 @@ Each stage was implemented in a dedicated branch and merged into `main`:
 6. `modernization/06-dnd-order` — drag-and-drop and persisted ordering.
 7. `modernization/07-portability` — JSON export/import UI.
 8. `modernization/08-docs-demo-workflow` — documentation and demo deployment.
-

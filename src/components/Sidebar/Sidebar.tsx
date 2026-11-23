@@ -11,6 +11,7 @@ import {
 } from "@src/features/tasks/task.repository";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
+import { t } from "@src/i18n/en";
 import {
   App as AntApp,
   Button,
@@ -69,9 +70,9 @@ export const Sidebar = ({
       onSelectProject(project.id);
       setIsModalOpen(false);
       form.resetFields();
-      message.success("Proyecto creado");
+      message.success(t("sidebar.projectCreated"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo crear el proyecto");
+      message.error(caught instanceof Error ? caught.message : t("sidebar.projectCreateFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -80,9 +81,9 @@ export const Sidebar = ({
   const handleDelete = async (id: string) => {
     try {
       await deleteProject(id);
-      message.success("Proyecto eliminado");
+      message.success(t("sidebar.projectDeleted"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo eliminar el proyecto");
+      message.error(caught instanceof Error ? caught.message : t("sidebar.projectDeleteFailed"));
     }
   };
 
@@ -99,20 +100,20 @@ export const Sidebar = ({
           <span className="truncate">{project.name}</span>
         </span>
         <Popconfirm
-          title="¿Eliminar proyecto?"
-          description="Se eliminarán también sus tareas."
-          okText="Eliminar"
-          cancelText="Cancelar"
+          title={t("sidebar.deleteProjectTitle")}
+          description={t("sidebar.deleteProjectDescription")}
+          okText={t("sidebar.delete")}
+          cancelText={t("sidebar.cancel")}
           okButtonProps={{ danger: true }}
           onConfirm={() => void handleDelete(project.id)}
         >
-          <Tooltip title="Eliminar proyecto">
+          <Tooltip title={t("sidebar.deleteProjectTooltip")}>
             <Button
               type="text"
               size="small"
               danger
               icon={<DeleteOutlined />}
-              aria-label={`Eliminar ${project.name}`}
+              aria-label={t("sidebar.deleteProjectAria", { name: project.name })}
               onClick={(event) => event.stopPropagation()}
             />
           </Tooltip>
@@ -129,7 +130,7 @@ export const Sidebar = ({
         </span>
         {!collapsed && (
           <Text strong className="truncate text-slate-900 dark:text-slate-50">
-            Simple Tasks
+            {t("sidebar.brand")}
           </Text>
         )}
       </div>
@@ -140,7 +141,7 @@ export const Sidebar = ({
             type="secondary"
             className="mb-2 block px-4 text-xs font-semibold uppercase tracking-wide"
           >
-            Proyectos
+            {t("sidebar.projects")}
           </Text>
         )}
         <Menu
@@ -159,27 +160,27 @@ export const Sidebar = ({
             type="primary"
             icon={<PlusOutlined />}
             block={!collapsed}
-            aria-label="Nuevo proyecto"
+            aria-label={t("sidebar.newProject")}
             onClick={() => setIsModalOpen(true)}
           >
-            {!collapsed && "Nuevo proyecto"}
+            {!collapsed && t("sidebar.newProject")}
           </Button>
           {projects.length === 0 && (
             <Button
               icon={<ThunderboltOutlined />}
               block={!collapsed}
               loading={isLoading}
-              aria-label="Cargar ejemplo"
+              aria-label={t("sidebar.loadExample")}
               onClick={onLoadExample}
             >
-              {!collapsed && "Cargar ejemplo"}
+              {!collapsed && t("sidebar.loadExample")}
             </Button>
           )}
         </Space>
       </div>
 
       <Modal
-        title="Nuevo proyecto"
+        title={t("sidebar.newProject")}
         open={isModalOpen}
         footer={null}
         onCancel={() => setIsModalOpen(false)}
@@ -193,22 +194,27 @@ export const Sidebar = ({
         >
           <Form.Item
             name="name"
-            label="Nombre"
+            label={t("sidebar.name")}
             rules={[
-              { required: true, message: "Ingresa un nombre" },
-              { max: 80, message: "Máximo 80 caracteres" },
+              { required: true, message: t("sidebar.enterName") },
+              { max: 80, message: t("sidebar.nameMax") },
             ]}
           >
-            <Input placeholder="Ej. Trabajo" maxLength={80} autoFocus />
+            <Input placeholder={t("sidebar.nameExample")} maxLength={80} autoFocus />
           </Form.Item>
-          <Form.Item name="color" label="Color">
+          <Form.Item name="color" label={t("sidebar.color")}>
             <Input type="color" className="h-10 cursor-pointer p-1" />
           </Form.Item>
-          <Form.Item name="description" label="Descripción">
-            <Input.TextArea rows={3} maxLength={500} showCount placeholder="Opcional" />
+          <Form.Item name="description" label={t("sidebar.description")}>
+            <Input.TextArea
+              rows={3}
+              maxLength={500}
+              showCount
+              placeholder={t("sidebar.optional")}
+            />
           </Form.Item>
           <Button type="primary" htmlType="submit" block loading={isSaving}>
-            Crear proyecto
+            {t("sidebar.createProject")}
           </Button>
         </Form>
       </Modal>

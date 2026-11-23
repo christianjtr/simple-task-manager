@@ -47,7 +47,7 @@ describe("TaskBoardStage", () => {
   it("exposes a keyboard-accessible drag handle for each task", () => {
     renderStage([task("1", TaskStatus.TODO)]);
 
-    const handle = screen.getByRole("button", { name: "Arrastrar Task 1" });
+    const handle = screen.getByRole("button", { name: "Drag Task 1" });
     expect(handle).toBeInTheDocument();
     expect(handle).toHaveAttribute("tabindex", "0");
   });

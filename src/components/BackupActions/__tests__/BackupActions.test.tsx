@@ -30,7 +30,7 @@ const renderActions = () =>
     </AntApp>,
   );
 
-const openMenu = () => fireEvent.click(screen.getByRole("button", { name: /Datos/ }));
+const openMenu = () => fireEvent.click(screen.getByRole("button", { name: /Data/ }));
 
 describe("BackupActions", () => {
   beforeEach(() => {
@@ -57,11 +57,11 @@ describe("BackupActions", () => {
     renderActions();
 
     openMenu();
-    fireEvent.click(screen.getByText("Exportar JSON"));
+    fireEvent.click(screen.getByText("Export JSON"));
 
     expect(URL.createObjectURL).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
-    expect(messageMock.success).toHaveBeenCalledWith("Respaldo exportado");
+    expect(messageMock.success).toHaveBeenCalledWith("Backup exported");
   });
 
   it("imports a selected JSON file and reports counts", async () => {
@@ -81,13 +81,13 @@ describe("BackupActions", () => {
     renderActions();
 
     openMenu();
-    fireEvent.click(screen.getByText("Importar JSON"));
-    fireEvent.change(screen.getByLabelText("Archivo de respaldo"), {
+    fireEvent.click(screen.getByText("Import JSON"));
+    fireEvent.change(screen.getByLabelText("Backup file"), {
       target: { files: [file] },
     });
 
     await waitFor(() => expect(mockImport).toHaveBeenCalledWith(backup));
-    expect(await screen.findByText("Importación completada")).toBeInTheDocument();
+    expect(await screen.findByText("Import complete")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
   });

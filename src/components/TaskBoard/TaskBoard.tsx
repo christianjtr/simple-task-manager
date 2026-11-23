@@ -22,6 +22,7 @@ import {
 import type { Task, TaskFilters, TaskPriority, TaskStatus } from "@src/features/tasks/task.types";
 import { filterTasks } from "@src/features/tasks/task.utils";
 import { useTasks } from "@src/hooks/useTasks";
+import { t } from "@src/i18n/en";
 import { Alert, App as AntApp, Button, Col, Row, Spin, Typography } from "antd";
 import { useMemo, useState } from "react";
 
@@ -76,7 +77,7 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
   const hasFilters = Boolean(filters.search?.trim() || filters.priority || filters.tag);
 
   const getTaskTitle = (id: string | number) =>
-    tasks.find((task) => task.id === String(id))?.title ?? "tarea";
+    tasks.find((task) => task.id === String(id))?.title ?? t("announcements.taskFallback");
 
   const getOverStatus = (over: DragEndEvent["over"]): TaskStatus | null => {
     if (!over) return null;
@@ -87,21 +88,27 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
 
   const getOverLabel = (over: DragEndEvent["over"]) => {
     const status = getOverStatus(over);
-    if (!status) return "ningún destino";
+    if (!status) return t("announcements.noDestination");
     return DEFAULT_STAGES.find((stage) => stage.status === status)?.title ?? status;
   };
 
   const announcements: Announcements = {
-    onDragStart: ({ active }) => `Se levantó ${getTaskTitle(active.id)}`,
+    onDragStart: ({ active }) => t("announcements.dragStart", { task: getTaskTitle(active.id) }),
     onDragOver: ({ active, over }) =>
       over
-        ? `${getTaskTitle(active.id)} está sobre ${getOverLabel(over)}`
-        : `${getTaskTitle(active.id)} no tiene destino`,
+        ? t("announcements.dragOver", {
+            task: getTaskTitle(active.id),
+            target: getOverLabel(over),
+          })
+        : t("announcements.dragOverNoDestination", { task: getTaskTitle(active.id) }),
     onDragEnd: ({ active, over }) =>
       over
-        ? `${getTaskTitle(active.id)} se movió a ${getOverLabel(over)}`
-        : `Movimiento de ${getTaskTitle(active.id)} cancelado`,
-    onDragCancel: ({ active }) => `Movimiento de ${getTaskTitle(active.id)} cancelado`,
+        ? t("announcements.dragEnd", {
+            task: getTaskTitle(active.id),
+            target: getOverLabel(over),
+          })
+        : t("announcements.dragCancel", { task: getTaskTitle(active.id) }),
+    onDragCancel: ({ active }) => t("announcements.dragCancel", { task: getTaskTitle(active.id) }),
   };
 
   const clearFilters = () => setFilters({});
@@ -130,16 +137,16 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
 
       if (editingTask) {
         await updateTask(editingTask.id, payload);
-        message.success("Tarea actualizada");
+        message.success(t("taskMessages.updated"));
       } else {
         await createTask({ projectId, ...payload });
-        message.success("Tarea creada");
+        message.success(t("taskMessages.created"));
       }
 
       setIsModalOpen(false);
       setEditingTask(null);
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo guardar la tarea");
+      message.error(caught instanceof Error ? caught.message : t("taskMessages.saveFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -148,19 +155,22 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
   const handleDelete = async (id: string) => {
     try {
       await deleteTask(id);
-      message.success("Tarea eliminada");
+      message.success(t("taskMessages.deleted"));
     } catch (caught) {
-      message.error(caught instanceof Error ? caught.message : "No se pudo eliminar la tarea");
+      message.error(caught instanceof Error ? caught.message : t("taskMessages.deleteFailed"));
     }
   };
 
   const handleMove = async (taskId: string, status: TaskStatus, index: number): Promise<void> => {
     try {
       await moveTaskInDb(taskId, status, index);
-      message.success(`Task ${taskId} moved to ${status}`);
+      message.success(t("taskMessages.moved", { id: taskId, status }));
     } catch (caught) {
       message.error(
-        `Cannot move task ${taskId}: ${caught instanceof Error ? caught.message : String(caught)}`,
+        t("taskMessages.moveFailed", {
+          id: taskId,
+          error: caught instanceof Error ? caught.message : String(caught),
+        }),
       );
     }
   };
@@ -192,14 +202,14 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <Title level={4} className="m-0">
-            Tareas
+            {t("board.tasks")}
           </Title>
           <Text type="secondary">
-            {tasks.length} {tasks.length === 1 ? "tarea" : "tareas"}
+            {tasks.length} {tasks.length === 1 ? t("board.taskSingular") : t("board.taskPlural")}
           </Text>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
-          Nueva tarea
+          {t("board.newTask")}
         </Button>
       </div>
 
@@ -220,10 +230,10 @@ const TaskBoard = ({ projectId }: TaskBoardProps) => {
         <Alert
           type="info"
           showIcon
-          message="No hay tareas con estos filtros"
+          message={t("board.noFilteredTasks")}
           action={
             <Button size="small" onClick={clearFilters}>
-              Limpiar filtros
+              {t("board.clearFilters")}
             </Button>
           }
           className="mb-4"

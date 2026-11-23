@@ -11,6 +11,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "@src/features/tasks/task.types";
 import { formatDueDate, toIsoString } from "@src/features/tasks/task.utils";
+import { t } from "@src/i18n/en";
 import { formatDateForDisplay } from "@src/utils/formatDateForDisplay";
 import { Button, Card, Popconfirm, Space, Tag, Tooltip, Typography } from "antd";
 import { type CSSProperties, useMemo } from "react";
@@ -110,12 +111,12 @@ const TaskCard = ({
         title={title}
         extra={
           <Space size={4}>
-            <Tag color={priorityColors[priority]}>{priority}</Tag>
+            <Tag color={priorityColors[priority]}>{t(`priority.${priority}`)}</Tag>
             <button
               ref={setActivatorNodeRef}
               type="button"
               className={styles.dragHandle}
-              aria-label={`Arrastrar ${title}`}
+              aria-label={t("taskCard.drag", { title })}
               {...attributes}
               {...listeners}
             >
@@ -127,11 +128,11 @@ const TaskCard = ({
       >
         <div className="mb-2 flex flex-wrap items-center gap-1">
           <Text type="secondary" className="text-xs">
-            Actualizado {updatedAtToDisplay}
+            {t("taskCard.updated", { date: updatedAtToDisplay })}
           </Text>
           {dueDate && (
             <Text type="secondary" className="text-xs">
-              Vence {formatDueDate(dueDate)}
+              {t("taskCard.due", { date: formatDueDate(dueDate) })}
             </Text>
           )}
           {tags.map((tag) => (
@@ -151,26 +152,26 @@ const TaskCard = ({
                 aria-label={`Edit ${title}`}
                 onClick={handleEdit}
               >
-                Editar
+                {t("taskCard.edit")}
               </Button>
             )}
             {onDelete && (
               <Popconfirm
-                title="¿Eliminar tarea?"
-                okText="Eliminar"
-                cancelText="Cancelar"
+                title={t("taskCard.deleteTitle")}
+                okText={t("taskCard.delete")}
+                cancelText={t("taskCard.cancel")}
                 okButtonProps={{ danger: true }}
                 onConfirm={() => onDelete(id)}
               >
-                <Tooltip title="Eliminar tarea">
+                <Tooltip title={t("taskCard.deleteTooltip")}>
                   <Button
                     type="link"
                     size="small"
                     danger
                     icon={<DeleteOutlined />}
-                    aria-label={`Delete ${title}`}
+                    aria-label={t("taskCard.deleteAria", { title })}
                   >
-                    Eliminar
+                    {t("taskCard.delete")}
                   </Button>
                 </Tooltip>
               </Popconfirm>
@@ -180,35 +181,35 @@ const TaskCard = ({
       </Card>
       {onMove && (
         <fieldset className={styles.controls}>
-          <legend className="sr-only">Move {title}</legend>
+          <legend className="sr-only">{t("taskCard.moveLegend", { title })}</legend>
           <Button
             size="small"
-            aria-label={`Move ${title} to previous column`}
-            title="Move to previous column"
+            aria-label={t("taskCard.movePreviousAria", { title })}
+            title={t("taskCard.movePreviousTitle")}
             disabled={!canMovePrevious}
             onClick={() => onMove("previous")}
             icon={<ArrowLeftOutlined />}
           />
           <Button
             size="small"
-            aria-label={`Move ${title} up`}
-            title="Move up"
+            aria-label={t("taskCard.moveUpAria", { title })}
+            title={t("taskCard.moveUpTitle")}
             disabled={!canMoveUp}
             onClick={() => onMove("up")}
             icon={<ArrowUpOutlined />}
           />
           <Button
             size="small"
-            aria-label={`Move ${title} down`}
-            title="Move down"
+            aria-label={t("taskCard.moveDownAria", { title })}
+            title={t("taskCard.moveDownTitle")}
             disabled={!canMoveDown}
             onClick={() => onMove("down")}
             icon={<ArrowDownOutlined />}
           />
           <Button
             size="small"
-            aria-label={`Move ${title} to next column`}
-            title="Move to next column"
+            aria-label={t("taskCard.moveNextAria", { title })}
+            title={t("taskCard.moveNextTitle")}
             disabled={!canMoveNext}
             onClick={() => onMove("next")}
             icon={<ArrowRightOutlined />}

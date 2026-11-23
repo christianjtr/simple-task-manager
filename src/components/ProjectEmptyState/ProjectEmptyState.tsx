@@ -1,4 +1,5 @@
 import { ThunderboltOutlined } from "@ant-design/icons";
+import { t } from "@src/i18n/en";
 import { Button, Card, Empty, Typography } from "antd";
 
 const { Text, Title } = Typography;
@@ -13,11 +14,10 @@ export const ProjectEmptyState = ({ onLoadExample, isLoading }: ProjectEmptyStat
     <Card className="w-full max-w-lg text-center shadow-sm">
       <Empty description={null}>
         <Title level={3} className="mb-2">
-          Organiza tu trabajo
+          {t("emptyState.title")}
         </Title>
         <Text type="secondary" className="mb-6 block">
-          Crea tu primer proyecto desde la barra lateral o carga un ejemplo para explorar el
-          tablero.
+          {t("emptyState.description")}
         </Text>
         <Button
           type="primary"
@@ -25,7 +25,7 @@ export const ProjectEmptyState = ({ onLoadExample, isLoading }: ProjectEmptyStat
           loading={isLoading}
           onClick={onLoadExample}
         >
-          Cargar ejemplo
+          {t("emptyState.loadExample")}
         </Button>
       </Empty>
     </Card>

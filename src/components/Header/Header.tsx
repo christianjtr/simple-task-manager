@@ -3,12 +3,12 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { BackupActions } from "@src/components/BackupActions/BackupActions";
 import type { Project } from "@src/features/tasks/task.types";
 import type { ThemeMode } from "@src/hooks/useTheme";
-import { Avatar, Button, Layout, Space, Tooltip, Typography } from "antd";
+import { t } from "@src/i18n/en";
+import { Button, Layout, Space, Tooltip, Typography } from "antd";
 
 const { Header: AntHeader } = Layout;
 const { Text, Title } = Typography;
@@ -30,7 +30,7 @@ export const Header = ({
 }: HeaderProps) => (
   <AntHeader className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 md:px-6">
     <div className="flex min-w-0 items-center gap-3">
-      <Tooltip title={collapsed ? "Mostrar proyectos" : "Ocultar proyectos"}>
+      <Tooltip title={collapsed ? t("header.showProjects") : t("header.hideProjects")}>
         <Button
           type="text"
           aria-label="Toggle sidebar"
@@ -40,17 +40,17 @@ export const Header = ({
       </Tooltip>
       <div className="min-w-0">
         <Title level={4} className="m-0 truncate text-slate-900 dark:text-slate-50">
-          {activeProject?.name ?? "Sin proyecto"}
+          {activeProject?.name ?? t("header.noProject")}
         </Title>
         <Text type="secondary" className="hidden truncate sm:block">
-          {activeProject?.description || "Crea un proyecto para empezar"}
+          {activeProject?.description || t("header.createProjectPrompt")}
         </Text>
       </div>
     </div>
 
     <Space size="middle">
       <BackupActions />
-      <Tooltip title={theme === "dark" ? "Modo claro" : "Modo oscuro"}>
+      <Tooltip title={theme === "dark" ? t("header.lightMode") : t("header.darkMode")}>
         <Button
           type="text"
           aria-label="Toggle theme"
@@ -58,7 +58,6 @@ export const Header = ({
           onClick={onToggleTheme}
         />
       </Tooltip>
-      <Avatar icon={<UserOutlined />} />
     </Space>
   </AntHeader>
 );

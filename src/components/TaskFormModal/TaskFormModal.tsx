@@ -1,4 +1,5 @@
 import { type Task, type TaskPriority, TaskStatus } from "@src/features/tasks/task.types";
+import { t } from "@src/i18n/en";
 import { Button, Form, Input, Modal, Select, Space } from "antd";
 import { DateTime } from "luxon";
 import { useEffect } from "react";
@@ -47,7 +48,7 @@ export const TaskFormModal = ({ open, task, isSaving, onClose, onSubmit }: TaskF
 
   return (
     <Modal
-      title={task ? "Editar tarea" : "Nueva tarea"}
+      title={task ? t("taskForm.editTask") : t("taskForm.newTask")}
       open={open}
       onCancel={onClose}
       footer={null}
@@ -61,21 +62,26 @@ export const TaskFormModal = ({ open, task, isSaving, onClose, onSubmit }: TaskF
       >
         <Form.Item
           name="title"
-          label="Título"
+          label={t("taskForm.title")}
           rules={[
-            { required: true, message: "Ingresa un título" },
-            { max: 120, message: "Máximo 120 caracteres" },
+            { required: true, message: t("taskForm.enterTitle") },
+            { max: 120, message: t("taskForm.titleMax") },
           ]}
         >
-          <Input placeholder="Ej. Preparar reunión" maxLength={120} autoFocus />
+          <Input placeholder={t("taskForm.titleExample")} maxLength={120} autoFocus />
         </Form.Item>
 
-        <Form.Item name="description" label="Descripción">
-          <Input.TextArea rows={3} maxLength={1000} showCount placeholder="Opcional" />
+        <Form.Item name="description" label={t("taskForm.description")}>
+          <Input.TextArea
+            rows={3}
+            maxLength={1000}
+            showCount
+            placeholder={t("taskForm.optional")}
+          />
         </Form.Item>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Form.Item name="status" label="Estado">
+          <Form.Item name="status" label={t("taskForm.status")}>
             <Select>
               <Option value={TaskStatus.TODO}>To Do</Option>
               <Option value={TaskStatus.IN_PROGRESS}>In Progress</Option>
@@ -83,29 +89,33 @@ export const TaskFormModal = ({ open, task, isSaving, onClose, onSubmit }: TaskF
             </Select>
           </Form.Item>
 
-          <Form.Item name="priority" label="Prioridad">
+          <Form.Item name="priority" label={t("taskForm.priority")}>
             <Select>
-              <Option value="low">Baja</Option>
-              <Option value="medium">Media</Option>
-              <Option value="high">Alta</Option>
+              <Option value="low">{t("priority.low")}</Option>
+              <Option value="medium">{t("priority.medium")}</Option>
+              <Option value="high">{t("priority.high")}</Option>
             </Select>
           </Form.Item>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Form.Item name="dueDate" label="Fecha de entrega">
-            <Input type="date" aria-label="Fecha de entrega" />
+          <Form.Item name="dueDate" label={t("taskForm.dueDate")}>
+            <Input type="date" aria-label={t("taskForm.dueDate")} />
           </Form.Item>
 
-          <Form.Item name="tags" label="Tags">
-            <Select mode="tags" tokenSeparators={[","]} placeholder="Escribe y pulsa Enter" />
+          <Form.Item name="tags" label={t("taskForm.tags")}>
+            <Select
+              mode="tags"
+              tokenSeparators={[","]}
+              placeholder={t("taskForm.tagsPlaceholder")}
+            />
           </Form.Item>
         </div>
 
         <Space className="mt-2 w-full justify-end">
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={onClose}>{t("taskForm.cancel")}</Button>
           <Button type="primary" htmlType="submit" loading={isSaving}>
-            {task ? "Guardar cambios" : "Crear tarea"}
+            {task ? t("taskForm.saveChanges") : t("taskForm.createTask")}
           </Button>
         </Space>
       </Form>

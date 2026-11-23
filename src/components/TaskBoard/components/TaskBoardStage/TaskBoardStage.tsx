@@ -1,6 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { Task, TaskStatus } from "@src/features/tasks/task.types";
+import { t } from "@src/i18n/en";
 import { Empty, Typography } from "antd";
 import { STAGE_ORDER } from "../../stages";
 import { TaskCard, type TaskMoveDirection } from "../TaskCard/TaskCard";
@@ -69,7 +70,7 @@ const TaskBoardStage = ({
         >
           {tasks.length === 0 && (
             <li>
-              <Empty description="Drop tasks here" className={styles.empty} />
+              <Empty description={t("stage.dropTasks")} className={styles.empty} />
             </li>
           )}
           {tasks.map((task, index) => (

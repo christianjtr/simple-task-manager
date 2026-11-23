@@ -15,5 +15,5 @@ export function formatDateForDisplay(updatedAtString: string): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d ago`;
 
-  return date.toLocaleString();
+  return date.toLocaleString("en");
 }
