@@ -1,4 +1,4 @@
-import { TaskStatus } from "@src/types/task";
+import { TaskStatus } from "@src/features/tasks/task.types";
 
 export const STAGE_ORDER: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
 

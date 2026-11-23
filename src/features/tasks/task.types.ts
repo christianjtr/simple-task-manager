@@ -1,6 +1,8 @@
-import { TaskStatus } from "@src/types/task";
-
-export { TaskStatus };
+export enum TaskStatus {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE",
+}
 
 export type TaskPriority = "low" | "medium" | "high";
 

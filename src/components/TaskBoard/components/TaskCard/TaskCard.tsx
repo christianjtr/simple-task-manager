@@ -4,8 +4,8 @@ import {
   ArrowRightOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons";
-import { OptimizedImage } from "@components/OptimizedImage/OptimizedImage";
-import type { Task } from "@src/types/task";
+import type { Task } from "@src/features/tasks/task.types";
+import { toIsoString } from "@src/features/tasks/task.utils";
 import { formatDateForDisplay } from "@src/utils/formatDateForDisplay";
 import { Button, Card, Typography } from "antd";
 import { type DragEventHandler, useMemo } from "react";
@@ -33,7 +33,6 @@ const TaskCard = ({
   title,
   description,
   updatedAt,
-  image,
   className,
   onDragStart,
   onDragEnd,
@@ -45,7 +44,10 @@ const TaskCard = ({
   canMovePrevious = false,
   canMoveNext = false,
 }: TaskCardProps) => {
-  const updatedAtToDisplay = useMemo(() => formatDateForDisplay(updatedAt), [updatedAt]);
+  const updatedAtToDisplay = useMemo(
+    () => formatDateForDisplay(toIsoString(updatedAt)),
+    [updatedAt],
+  );
 
   return (
     <li
@@ -60,16 +62,6 @@ const TaskCard = ({
     >
       <Card
         classNames={{ cover: styles.image }}
-        cover={
-          image ? (
-            <OptimizedImage
-              src={image.url}
-              alt={image.alt ?? title}
-              width={image.width}
-              height={image.height}
-            />
-          ) : undefined
-        }
         title={title}
         extra={<Text type="secondary">{updatedAtToDisplay}</Text>}
         className={styles.taskCard}

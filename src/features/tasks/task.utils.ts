@@ -1,6 +1,6 @@
-import type { TaskStatus } from "@src/types/task";
 import { DateTime } from "luxon";
-import type { Task, TaskFilters } from "./task.types";
+
+import type { Task, TaskFilters, TaskStatus } from "./task.types";
 
 export function createId(prefix: string): string {
   const uuid =

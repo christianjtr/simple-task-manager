@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from "@src/types/task";
+import type { Task, TaskStatus } from "@src/features/tasks/task.types";
 import { Empty, Typography } from "antd";
 import { type DragEvent, useState } from "react";
 import { STAGE_ORDER } from "../../stages";

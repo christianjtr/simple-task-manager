@@ -1,60 +1,50 @@
-import { configureStore } from "@reduxjs/toolkit";
-
+import { moveTask } from "@src/features/tasks/task.repository";
+import { type Task, TaskStatus } from "@src/features/tasks/task.types";
+import { useTasks } from "@src/hooks/useTasks";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { App as AntApp } from "antd";
-import { Provider } from "react-redux";
 import { type MockedFunction, vi } from "vitest";
-import { useTaskService } from "../../../hooks/useTaskService";
-import taskSlice from "../../../store/taskSlice";
-import { type Task, TaskStatus } from "../../../types/task";
 import { TaskBoard } from "../TaskBoard";
 
-vi.mock("../../../hooks/useTaskService", () => ({
-  useTaskService: vi.fn(),
+vi.mock("@src/hooks/useTasks", () => ({
+  useTasks: vi.fn(),
 }));
 
-const mockUseTaskService = useTaskService as MockedFunction<typeof useTaskService>;
+vi.mock("@src/features/tasks/task.repository", () => ({
+  moveTask: vi.fn(),
+}));
+
+const mockUseTasks = useTasks as MockedFunction<typeof useTasks>;
+const mockMoveTask = moveTask as MockedFunction<typeof moveTask>;
 const messageMock = { success: vi.fn(), error: vi.fn() };
 
 const task = (id: string, status: TaskStatus): Task => ({
   id,
+  projectId: "project_1",
   title: `Task ${id}`,
   description: "description",
   status,
-  createdAt: "2026-01-01T00:00:00.000Z",
-  updatedAt: "2026-01-01T00:00:00.000Z",
+  position: 0,
+  priority: "medium",
+  tags: [],
+  createdAt: new Date("2026-01-01T00:00:00.000Z"),
+  updatedAt: new Date("2026-01-01T00:00:00.000Z"),
 });
 
-const reload = vi.fn();
-const moveTask = vi.fn();
-
-const renderBoard = () => {
-  const store = configureStore({ reducer: { tasks: taskSlice } });
-  return render(
-    <Provider store={store}>
+const renderBoard = () =>
+  render(
+    <AntApp>
       <TaskBoard />
-    </Provider>,
+    </AntApp>,
   );
-};
 
 describe("TaskBoard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    reload.mockResolvedValue(undefined);
     vi.spyOn(AntApp, "useApp").mockReturnValue({
       message: messageMock,
     } as never);
-    mockUseTaskService.mockReturnValue({
-      tasks: [],
-      isLoading: false,
-      error: null,
-      connectionStatus: "connected",
-      reload,
-      moveTask,
-      createTask: vi.fn(),
-      updateTaskById: vi.fn(),
-      deleteTask: vi.fn(),
-    });
+    mockUseTasks.mockReturnValue({ tasks: [], isLoading: false });
   });
 
   afterEach(() => {
@@ -71,13 +61,13 @@ describe("TaskBoard", () => {
   });
 
   it("groups tasks by status", () => {
-    mockUseTaskService.mockReturnValue({
-      ...mockUseTaskService(),
+    mockUseTasks.mockReturnValue({
       tasks: [
         task("1", TaskStatus.TODO),
         task("2", TaskStatus.IN_PROGRESS),
         task("3", TaskStatus.DONE),
       ],
+      isLoading: false,
     });
     renderBoard();
 
@@ -95,43 +85,31 @@ describe("TaskBoard", () => {
   });
 
   it("moves a task with the keyboard control and reports success", async () => {
-    mockUseTaskService.mockReturnValue({
-      ...mockUseTaskService(),
+    mockUseTasks.mockReturnValue({
       tasks: [task("1", TaskStatus.TODO)],
+      isLoading: false,
     });
-    moveTask.mockResolvedValueOnce(undefined);
+    mockMoveTask.mockResolvedValue(task("1", TaskStatus.IN_PROGRESS));
     renderBoard();
 
     fireEvent.click(screen.getByLabelText("Move Task 1 to next column"));
 
-    await waitFor(() => expect(moveTask).toHaveBeenCalledWith("1", TaskStatus.IN_PROGRESS, 0));
+    await waitFor(() => expect(mockMoveTask).toHaveBeenCalledWith("1", TaskStatus.IN_PROGRESS, 0));
     await waitFor(() =>
       expect(messageMock.success).toHaveBeenCalledWith("Task 1 moved to IN_PROGRESS"),
     );
   });
 
   it("reports a failed move without crashing", async () => {
-    mockUseTaskService.mockReturnValue({
-      ...mockUseTaskService(),
+    mockUseTasks.mockReturnValue({
       tasks: [task("1", TaskStatus.TODO)],
+      isLoading: false,
     });
-    moveTask.mockRejectedValueOnce(new Error("network down"));
+    mockMoveTask.mockRejectedValue(new Error("network down"));
     renderBoard();
 
     fireEvent.click(screen.getByLabelText("Move Task 1 to next column"));
     await waitFor(() => expect(messageMock.error).toHaveBeenCalled());
     expect(messageMock.error.mock.calls[0][0]).toContain("network down");
-  });
-
-  it("shows load errors and allows retrying", () => {
-    mockUseTaskService.mockReturnValue({
-      ...mockUseTaskService(),
-      error: "API unavailable",
-    });
-    renderBoard();
-
-    expect(screen.getByText("API unavailable")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
-    expect(reload).toHaveBeenCalledTimes(1);
   });
 });

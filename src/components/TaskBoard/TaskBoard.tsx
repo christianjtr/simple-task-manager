@@ -1,13 +1,14 @@
-import { useTaskService } from "@src/hooks/useTaskService";
-import type { TaskStatus } from "@src/types/task";
-import { Alert, App as AntApp, Button, Col, Row, Spin } from "antd";
+import { moveTask as moveTaskInDb } from "@src/features/tasks/task.repository";
+import type { TaskStatus } from "@src/features/tasks/task.types";
+import { useTasks } from "@src/hooks/useTasks";
+import { App as AntApp, Col, Row, Spin } from "antd";
 import { useMemo } from "react";
 import { TaskBoardStage } from "./components/TaskBoardStage/TaskBoardStage";
 import { DEFAULT_STAGES } from "./stages";
 
 const TaskBoard = () => {
   const { message } = AntApp.useApp();
-  const { tasks, isLoading, error, reload, moveTask } = useTaskService();
+  const { tasks, isLoading } = useTasks();
 
   const stages = useMemo(
     () =>
@@ -20,7 +21,7 @@ const TaskBoard = () => {
 
   const handleMove = async (taskId: string, status: TaskStatus, index: number): Promise<void> => {
     try {
-      await moveTask(taskId, status, index);
+      await moveTaskInDb(taskId, status, index);
       message.success(`Task ${taskId} moved to ${status}`);
     } catch (caught) {
       message.error(
@@ -30,20 +31,7 @@ const TaskBoard = () => {
   };
 
   return (
-    <Spin spinning={isLoading && tasks.length === 0} tip="Loading tasks…">
-      {error && (
-        <Alert
-          type="error"
-          showIcon
-          message="Could not load tasks"
-          description={error}
-          action={
-            <Button size="small" onClick={() => void reload().catch(() => {})}>
-              Retry
-            </Button>
-          }
-        />
-      )}
+    <Spin spinning={isLoading && tasks.length === 0}>
       <Row gutter={[24, 24]}>
         {stages.map((stage) => (
           <Col key={stage.id} span={24 / stages.length}>

@@ -1,5 +1,6 @@
-import { TaskStatus } from "@src/types/task";
 import { z } from "zod";
+
+import { TaskStatus } from "./task.types";
 
 const isoDateStringSchema = z.iso.datetime({ offset: true });
 const isoDateSchema = isoDateStringSchema.transform((value) => new Date(value));

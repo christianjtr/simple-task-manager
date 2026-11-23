@@ -1,5 +1,4 @@
-import { type Task, TaskStatus } from "@src/types/task";
-
+import { type Task, TaskStatus } from "@src/features/tasks/task.types";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 import { TaskBoardStage } from "../TaskBoardStage";
@@ -10,17 +9,15 @@ vi.mock("@components/OptimizedImage/OptimizedImage", () => ({
 
 const task = (id: string, status: TaskStatus): Task => ({
   id: `task-${id}`,
+  projectId: "project_1",
   title: `Task ${id}`,
   description: "description",
   status,
-  createdAt: "2026-01-01T00:00:00.000Z",
-  updatedAt: "2026-01-01T00:00:00.000Z",
-  image: {
-    id: `image-${id}`,
-    url: "https://example.com/image.jpg",
-    width: 400,
-    height: 300,
-  },
+  position: Number(id),
+  priority: "medium",
+  tags: [],
+  createdAt: new Date("2026-01-01T00:00:00.000Z"),
+  updatedAt: new Date("2026-01-01T00:00:00.000Z"),
 });
 
 const onMoveTask = vi.fn().mockResolvedValue(undefined);
